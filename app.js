@@ -83,7 +83,7 @@ function go(page) {
   $$(".nav").forEach(x => x.classList.toggle("active", x.dataset.page === page));
   const titles = {
     dashboard: "Team Dashboard", players: "Players", matches: "Matches", rankings: "Rankings",
-    analytics: "Analytics", venues: "Venues", leaders: "The Leaders of Kohat Zalmi",
+    analytics: "Analytics", venues: "Venues", leaders: "The Leaders of Kohat Zalmi", team: "Meet Our Team",
     funds: "Kohat Zalmi Funds", add: "Add Performance", addPlayer: "Add Player"
   };
   $("#title").textContent = titles[page] || "Kohat Zalmi";
@@ -128,12 +128,53 @@ function render() {
   $("#recent").innerHTML = [...m].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 5)
     .map((x, i) => `<div class="performer" style="animation-delay:${i * 60}ms"><div class="grow"><b>${esc(x.opponent)}</b><small>${esc(x.date)} • ${esc(x.venue)}</small></div><b>${esc(x.result)}</b></div>`).join("") || `<div class="muted">No matches yet.</div>`;
 
-  renderPlayers(); renderMatches(); renderRankings(); renderAnalytics(); renderVenues(); renderFunds();
+  renderPlayers(); renderMatches(); renderRankings(); renderAnalytics(); renderVenues(); renderTeam(); renderFunds();
   fillPlayerSelect(); updateAccessUI();
   animateNumbers(); observeReveals();
 }
 
 /* ---------- Players ---------------------------------------------------- */
+
+const TEAM_ROSTER = [
+  {name:"M. Usman", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/M.Usman-RA_Fast_Bowler.png"},
+  {name:"Sikander", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/Sikander-RA_Fast_Bowler.jpg"},
+  {name:"Awais", role:"All-Rounder", bowling:"Right-Arm Off-Break Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Awais-RA_Off_Break-RH_Batsman.png"},
+  {name:"M. Luqman", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", photo:"assets/team/M.Luqman-RA_Fast_Bowler-RH_Batsman.png"},
+  {name:"Janzaib", role:"Wicket Keeper • Batsman", bowling:"", batting:"Batsman", photo:"assets/team/Janzaib-WK_Batsman.png"},
+  {name:"Sohail", role:"Batsman", bowling:"", batting:"Right-Hand Batsman", photo:"assets/team/Sohail-RH_Batsman.png"},
+  {name:"Farhan", role:"Bowler", bowling:"Left-Arm Wrist Spinner", batting:"", photo:"assets/team/Farhan-LA_Wrist_Spiner.png"},
+  {name:"Adnan", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Adnan-RA_Fast_Bowler-RH_Batsman.png"},
+  {name:"Shahzad", role:"All-Rounder", bowling:"Right-Arm Off-Break Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Shahzad-RA_Off_Break-RH_Batsman.png"},
+  {name:"Naimat", role:"Bowler", bowling:"Right-Arm Leg-Break Bowler", batting:"", photo:"assets/team/Naimat-RA_Leg_Break.png"},
+  {name:"M. Bilal", role:"All-Rounder", bowling:"Right-Arm Slow Wrist Spinner", batting:"Right-Hand Batsman", captain:"Captain", jersey:"56", photo:"assets/team/M.Bilal-RH_Slow_Wrist_Spiner-RH_Batsman-Captain.png"},
+  {name:"M. Jibran", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", captain:"Vice Captain", jersey:"07", photo:"assets/team/M.Jibran-RA_Fast_Bowler-RH_Batsman-Vice_Captain.png"},
+  {name:"Maidad", role:"Wicket Keeper • Batsman", bowling:"", batting:"Batsman", photo:"assets/team/Maidad-WK_Batsman.png"},
+  {name:"SanaUllah", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/SanaUllah-RA_Fast_Bowler.png"}
+];
+
+function renderTeam() {
+  const grid = $("#teamGrid");
+  if (!grid) return;
+  $("#teamCount").textContent = TEAM_ROSTER.length + " Players";
+  grid.innerHTML = TEAM_ROSTER.map((p,i) => `
+    <article class="teamPlayerCard" style="--delay:${Math.min(i,11)*55}ms">
+      <div class="teamCardGlow"></div>
+      <div class="teamPhotoFrame">
+        <div class="teamPhotoHalo"></div>
+        <img src="${p.photo}" alt="${esc(p.name)}" loading="lazy">
+        ${p.captain ? `<span class="teamCaptainBadge">${esc(p.captain)}</span>` : ""}
+      </div>
+      <div class="teamCardBody">
+        <div class="teamRole">${esc(p.role)}</div>
+        <h3>${esc(p.name)}</h3>
+        ${p.jersey ? `<div class="teamJersey">#${esc(p.jersey)}</div>` : ""}
+        <div class="teamInfoList">
+          ${p.batting ? `<span><b>BAT</b>${esc(p.batting)}</span>` : ""}
+          ${p.bowling ? `<span><b>BOWL</b>${esc(p.bowling)}</span>` : ""}
+        </div>
+      </div>
+    </article>`).join("");
+}
 
 function renderPlayers() {
   const q = ($("#search")?.value || "").toLowerCase();
