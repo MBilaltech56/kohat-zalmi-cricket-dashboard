@@ -8,7 +8,7 @@ const SUPABASE_KEY = "sb_publishable_yKCdQBSPvkisSWncHbGmBg_-6u9DEyP";
 const OWNER_UID = "f62ca7bc-486d-462f-92dd-6415e0e90973";
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let state = { players: [], matches: [], funds: [], expenses: [] };
+let state = { players: [], matches: [] };
 let isAdmin = false;
 
 const $ = s => document.querySelector(s);
@@ -84,7 +84,7 @@ function go(page) {
   const titles = {
     dashboard: "Team Dashboard", players: "Players", matches: "Matches", rankings: "Rankings",
     analytics: "Analytics", venues: "Venues", leaders: "The Leaders of Kohat Zalmi", team: "Meet Our Team",
-    funds: "Kohat Zalmi Funds", add: "Add Performance", addPlayer: "Add Player"
+    add: "Add Performance", addPlayer: "Add Player"
   };
   $("#title").textContent = titles[page] || "Kohat Zalmi";
   $("#desc").textContent = page === "dashboard"
@@ -128,7 +128,7 @@ function render() {
   $("#recent").innerHTML = [...m].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 5)
     .map((x, i) => `<div class="performer" style="animation-delay:${i * 60}ms"><div class="grow"><b>${esc(x.opponent)}</b><small>${esc(x.date)} • ${esc(x.venue)}</small></div><b>${esc(x.result)}</b></div>`).join("") || `<div class="muted">No matches yet.</div>`;
 
-  renderPlayers(); renderMatches(); renderRankings(); renderAnalytics(); renderVenues(); renderTeam(); renderFunds();
+  renderPlayers(); renderMatches(); renderRankings(); renderAnalytics(); renderVenues(); renderTeam();
   fillPlayerSelect(); updateAccessUI();
   animateNumbers(); observeReveals();
 }
@@ -149,7 +149,8 @@ const TEAM_ROSTER = [
   {name:"M. Bilal", role:"All-Rounder", bowling:"Right-Arm Slow Wrist Spinner", batting:"Right-Hand Batsman", captain:"Captain", jersey:"56", photo:"assets/team/M.Bilal-RH_Slow_Wrist_Spiner-RH_Batsman-Captain.png"},
   {name:"M. Jibran", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", captain:"Vice Captain", jersey:"07", photo:"assets/team/M.Jibran-RA_Fast_Bowler-RH_Batsman-Vice_Captain.png"},
   {name:"Maidad", role:"Wicket Keeper • Batsman", bowling:"", batting:"Batsman", photo:"assets/team/Maidad-WK_Batsman.png"},
-  {name:"SanaUllah", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/SanaUllah-RA_Fast_Bowler.png"}
+  {name:"SanaUllah", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/SanaUllah-RA_Fast_Bowler.png"},
+  {name:"Shahab", role:"Batsman", bowling:"", batting:"Right-Hand Batsman", photo:"assets/team/Shahab-RH_Batsman.jpg"}
 ];
 
 function renderTeam() {
@@ -350,126 +351,6 @@ function renderVenues() {
   $("#venueTable").innerHTML = a.map(([v, x]) => `<tr><td data-label="Venue"><b>${esc(v)}</b></td><td data-label="Matches">${x.m}</td><td data-label="Wins">${x.w}</td><td data-label="Win Rate">${fmt(x.w / x.m * 100)}%</td></tr>`).join("") || `<tr><td colspan="4">No venue data.</td></tr>`;
 }
 
-/* ---------- Funds -------------------------------------------------------- */
-
-const FUND_MONTHLY = 200;
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-function money(v) { return "Rs " + n(v).toLocaleString("en-PK"); }
-
-function selectedFundYear() {
-  const y = Number($("#fundYear")?.value || new Date().getFullYear());
-  return Number.isFinite(y) ? y : new Date().getFullYear();
-}
-
-// Fund collection officially starts on the first day of NEXT month.
-// Before that start date, months are not marked Pending.
-function fundStartDate() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth() + 1, 1);
-}
-
-function dueMonthsForYear(year) {
-  const start = fundStartDate();
-  const startYear = start.getFullYear();
-  const startMonth = start.getMonth() + 1;
-  if (year < startYear) return 0;
-  if (year === startYear) return 12 - startMonth + 1;
-  return 12;
-}
-
-function activeMonthForYear(year, monthNo) {
-  const start = fundStartDate();
-  const keyDate = new Date(year, monthNo - 1, 1);
-  return keyDate >= start;
-}
-
-function renderFunds() {
-  const year = selectedFundYear();
-  const due = dueMonthsForYear(year);
-  const start = fundStartDate();
-  const allPlayers = state.players || [];
-  const search = String($("#fundSearch")?.value || "").trim().toLowerCase();
-  const players = search ? allPlayers.filter(p => `${p.name || ""} ${p.jersey || ""}`.toLowerCase().includes(search)) : allPlayers;
-  const yearFunds = (state.funds || []).filter(f => String(f.fund_month || "").startsWith(String(year) + "-"));
-  const yearExpenses = (state.expenses || []).filter(e => String(e.date || "").startsWith(String(year) + "-"));
-  const collected = yearFunds.reduce((a, f) => a + n(f.amount), 0);
-  const expected = players.length * due * FUND_MONTHLY;
-  const pending = Math.max(0, expected - collected);
-  const used = yearExpenses.reduce((a, e) => a + n(e.amount), 0);
-  const available = collected - used;
-
-  $("#fundExpected").textContent = money(expected);
-  $("#fundCollected").textContent = money(collected);
-  $("#fundPending").textContent = money(pending);
-  $("#fundUsed").textContent = money(used);
-  $("#fundAvailable").textContent = money(available);
-
-  const years = new Set([new Date().getFullYear(), year]);
-  (state.funds || []).forEach(f => { const y = String(f.fund_month || "").slice(0, 4); if (y) years.add(Number(y)); });
-  (state.expenses || []).forEach(e => { const y = String(e.date || "").slice(0, 4); if (y) years.add(Number(y)); });
-  const sortedYears = [...years].filter(Boolean).sort((a, b) => b - a);
-  const cur = String(year);
-  $("#fundYear").innerHTML = sortedYears.map(y => `<option value="${y}">${y}</option>`).join("");
-  $("#fundYear").value = sortedYears.includes(year) ? cur : String(sortedYears[0] || new Date().getFullYear());
-
-  $("#fundPlayers").innerHTML = players.map((p, idx) => {
-    const pf = yearFunds.filter(f => String(f.player_id) === String(p.id));
-    const paid = pf.reduce((a, f) => a + n(f.amount), 0);
-    const dueForPlayer = due * FUND_MONTHLY;
-    const playerPending = Math.max(0, dueForPlayer - paid);
-    return `<div class="fundPlayerCard" style="animation-delay:${Math.min(idx, 8) * 50}ms">
-      <div class="fundPlayerHead">${avatar(p, "fundAvatar")}<div class="grow"><h3>${esc(p.name)}</h3><small>#${esc(p.jersey)} • ${esc(p.role)}</small></div>
-        <div class="fundTotals"><span><b>${money(paid)}</b><small>Total Paid</small></span><span><b>${money(playerPending)}</b><small>Pending</small></span></div>
-      </div>
-      <div class="fundMonths">${MONTHS.map((m, i) => {
-        const monthNo = i + 1, key = `${year}-${String(monthNo).padStart(2, "0")}`;
-        const record = pf.find(f => String(f.fund_month) === key);
-        const active = activeMonthForYear(year, monthNo);
-        const upcoming = !active;
-        const delay = `style="animation-delay:${i * 25}ms"`;
-        if (upcoming) {
-          const label = new Date(year, monthNo - 1, 1) < start ? "Not Active" : "Upcoming";
-          return `<div class="fundMonth upcoming" ${delay}><b>${m}</b><span>Rs 200</span><small>${label}</small></div>`;
-        }
-        if (record) return `<div class="fundMonth paid" ${delay}><b>${m}</b><span>${money(record.amount)}</span><small>✓ Paid</small>${isAdmin ? `<button onclick="undoFund('${String(record.id)}')">Undo</button>` : ""}</div>`;
-        return `<div class="fundMonth pending" ${delay}><b>${m}</b><span>Rs 200</span><small>⏳ Pending</small>${isAdmin ? `<button onclick="markFundPaid('${String(p.id)}','${key}')">Mark Paid</button>` : ""}</div>`;
-      }).join("")}</div>
-    </div>`;
-  }).join("") || `<div class="muted">No players yet. Add players first.</div>`;
-
-  $("#expenseTable").innerHTML = yearExpenses.length
-    ? [...yearExpenses].sort((a, b) => String(b.date).localeCompare(String(a.date)))
-      .map(e => `<tr><td data-label="Date">${esc(e.date)}</td><td data-label="Description"><b>${esc(e.description)}</b></td><td data-label="Amount">${money(e.amount)}</td><td data-label="Action">${isAdmin ? `<button class="action danger" onclick="deleteExpense('${String(e.id)}')">Delete</button>` : "View"}</td></tr>`).join("")
-    : `<tr><td colspan="4">No expenses recorded for ${year}.</td></tr>`;
-}
-
-async function markFundPaid(playerId, month) {
-  if (!isAdmin) return openAuth();
-  if ((state.funds || []).some(f => String(f.player_id) === String(playerId) && String(f.fund_month) === month)) return;
-  const { data, error } = await db.from("player_funds").insert([{ player_id: String(playerId), fund_month: month, amount: FUND_MONTHLY, status: "Paid" }]).select().single();
-  if (error) return toast("Could not save fund: " + error.message, "err");
-  state.funds.push(data); renderFunds(); animateNumbers(); toast("Fund marked as paid.");
-}
-
-async function undoFund(id) {
-  if (!isAdmin) return;
-  if (!confirm("Undo this monthly fund payment?")) return;
-  const { error } = await db.from("player_funds").delete().eq("id", id);
-  if (error) return toast("Could not undo fund: " + error.message, "err");
-  state.funds = state.funds.filter(f => String(f.id) !== String(id));
-  renderFunds(); animateNumbers(); toast("Fund payment marked pending.");
-}
-
-async function deleteExpense(id) {
-  if (!isAdmin) return;
-  if (!confirm("Delete this expense? This cannot be undone.")) return;
-  const { error } = await db.from("fund_expenses").delete().eq("id", id);
-  if (error) return toast("Could not delete expense: " + error.message, "err");
-  state.expenses = state.expenses.filter(e => String(e.id) !== String(id));
-  renderFunds(); animateNumbers(); toast("Expense deleted.");
-}
-
 /* ---------- Access / selects --------------------------------------------- */
 
 function fillPlayerSelect() {
@@ -551,9 +432,6 @@ function animateNumbers() {
     const v = s.querySelector(".value");
     if (v) countUp(v, "summary" + i);
   });
-  ["#fundExpected", "#fundCollected", "#fundPending", "#fundUsed", "#fundAvailable"].forEach(id => {
-    const el = $(id); if (el) countUp(el, id);
-  });
   ["#wins", "#losses", "#ties", "#nr"].forEach(id => {
     const el = $(id); if (el) countUp(el, id);
   });
@@ -607,14 +485,12 @@ $("#login").addEventListener("click", openAuth);
 $("#closeAuth").addEventListener("click", closeAuth);
 $("#closeMatch").addEventListener("click", () => closeModal("#matchModal"));
 $("#closePlayer").addEventListener("click", closePlayerModal);
-$("#closeExpense").addEventListener("click", () => closeModal("#expenseModal"));
 $("#closeEditPlayer").addEventListener("click", () => closeModal("#editPlayerModal"));
 $("#closeEditMatch").addEventListener("click", () => closeModal("#editMatchModal"));
 
 $("#addMatch").addEventListener("click", () => {
   if (isAdmin) { fillBestPlayerSelects(); openModal("#matchModal"); } else openAuth();
 });
-$("#addExpense").addEventListener("click", () => { if (isAdmin) openModal("#expenseModal"); else openAuth(); });
 
 // Close a modal by clicking its backdrop, or with Escape.
 $$(".modal").forEach(mod => mod.addEventListener("click", e => { if (e.target === mod) closeModal(mod); }));
@@ -635,8 +511,6 @@ $("#playerGrid").addEventListener("keydown", e => {
 $("#search").addEventListener("input", () => { renderPlayers(); });
 $("#role").addEventListener("change", renderPlayers);
 $("#season").addEventListener("change", renderMatches);
-$("#fundYear").addEventListener("change", () => { renderFunds(); animateNumbers(); });
-$("#fundSearch").addEventListener("input", () => { renderFunds(); animateNumbers(); });
 
 /* ---------- Forms ------------------------------------------------------------ */
 
@@ -712,7 +586,23 @@ $("#matchForm").addEventListener("submit", async e => {
     best_bowler_runs: f.get("best_bowler_runs") ? n(f.get("best_bowler_runs")) : null,
     best_bowler_wickets: f.get("best_bowler_wickets") ? n(f.get("best_bowler_wickets")) : null
   };
-  const { data, error } = await db.from("matches").insert([m]).select().single();
+  let { data, error } = await db.from("matches").insert([m]).select().single();
+
+  // Some older matches tables have a broken/behind primary-key sequence.
+  // If that happens, retry once with a guaranteed-next id based on the
+  // existing table type (numeric id or UUID id).
+  if (error && /duplicate key value violates unique constraint.*matches_pkey/i.test(error.message || "")) {
+    const existingIds = state.matches.map(x => x.id).filter(v => v !== null && v !== undefined && v !== "");
+    const numericIds = existingIds.map(Number).filter(Number.isFinite);
+    const numericMode = existingIds.length > 0 && numericIds.length === existingIds.length;
+    if (numericMode) {
+      m.id = Math.max(0, ...numericIds) + 1;
+      ({ data, error } = await db.from("matches").insert([m]).select().single());
+    } else if (window.crypto?.randomUUID) {
+      m.id = crypto.randomUUID();
+      ({ data, error } = await db.from("matches").insert([m]).select().single());
+    }
+  }
   if (error) return toast("Could not save match: " + error.message, "err");
   state.matches.push(data); e.target.reset(); closeModal("#matchModal"); render(); go("matches"); toast("Match saved successfully.");
 });
@@ -753,33 +643,18 @@ $("#editMatchForm").addEventListener("submit", async e => {
   closeModal("#editMatchModal"); render(); toast("Match updated successfully.");
 });
 
-$("#expenseForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  if (!isAdmin) return openAuth();
-  const f = new FormData(e.target);
-  const expense = { date: f.get("date"), description: String(f.get("description") || "").trim(), amount: n(f.get("amount")) };
-  if (!expense.description || expense.amount <= 0) return toast("Enter a valid expense.", "err");
-  const { data, error } = await db.from("fund_expenses").insert([expense]).select().single();
-  if (error) return toast("Could not save expense: " + error.message, "err");
-  state.expenses.push(data); e.target.reset(); closeModal("#expenseModal"); renderFunds(); animateNumbers(); toast("Expense saved successfully.");
-});
-
 /* ---------- Init --------------------------------------------------------------- */
 
 async function init() {
   try {
     const session = await db.auth.getSession();
     isAdmin = String(session.data.session?.user?.id || "") === OWNER_UID;
-    const [p, m, f, e] = await Promise.all([
+    const [p, m] = await Promise.all([
       db.from("kohat zalmi").select("*").order("id", { ascending: true }),
-      db.from("matches").select("*").order("date", { ascending: false }),
-      db.from("player_funds").select("*").order("fund_month", { ascending: false }),
-      db.from("fund_expenses").select("*").order("date", { ascending: false })
+      db.from("matches").select("*").order("date", { ascending: false })
     ]);
     if (p.error) console.error(p.error); else state.players = p.data || [];
     if (m.error) console.error(m.error); else state.matches = m.data || [];
-    if (f.error) console.error("Funds table:", f.error); else state.funds = f.data || [];
-    if (e.error) console.error("Expenses table:", e.error); else state.expenses = e.data || [];
     updateAccessUI(); render();
   } catch (err) {
     console.error(err);

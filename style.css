@@ -646,7 +646,6 @@ div.win > div:last-child small{display:block;margin-top:3px;font-size:12px;color
 }
 .avatar img{width:100%;height:100%;object-fit:cover;transition:transform var(--t-slow) var(--ease-out)}
 .avatar.large{width:74px;height:74px;border-radius:20px;font-size:26px}
-.avatar.fundAvatar{width:48px;height:48px;border-radius:14px}
 
 /* ---------- 14. TOOLBAR + FIELDS -------------------------------------- */
 
@@ -1016,133 +1015,7 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;height:
 .leaderAccentRail i:nth-child(4){animation-delay:.75s}
 .leaderAccentRail i:nth-child(5){animation-delay:1s}
 
-/* ---------- 18. FUNDS -------------------------------------------------- */
-
-.fundHero{
-  position:relative;overflow:hidden;
-  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;
-  padding:22px;
-  background:linear-gradient(135deg,var(--surface-2),var(--surface));
-  border:1px solid var(--line);
-  border-radius:var(--r-lg);
-  box-shadow:var(--shadow-1);
-}
-.fundHero::before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(460px 200px at 100% 0%,var(--green-soft),transparent 70%);
-}
-.fundHero > div{position:relative;z-index:1;min-width:0}
-.fundHero small{font-size:10px;font-weight:800;letter-spacing:.2em;color:var(--muted)}
-.fundHero h2{margin-top:8px;font-size:clamp(20px,5.4vw,28px)}
-.fundHero p{margin-top:6px;font-size:13px;color:var(--muted);max-width:52ch}
-.fundHero p b{color:var(--gold)}
-.fundHeroBadge{
-  position:relative;z-index:1;flex:none;
-  padding:16px 22px;text-align:center;
-  font-family:"Sora",sans-serif;font-weight:800;font-size:24px;line-height:1.1;
-  color:#12201C;
-  background:linear-gradient(140deg,var(--gold-2),var(--gold));
-  border-radius:var(--r-md);
-  box-shadow:0 14px 34px -18px rgba(154,122,31,.95);
-}
-.fundHeroBadge span{
-  display:block;margin-top:4px;
-  font-family:"Manrope",sans-serif;font-size:9.5px;font-weight:800;letter-spacing:.14em;
-  opacity:.8;
-}
-
-.fundStats{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
-#fundAvailable{color:var(--green)}
-#fundPending{color:var(--amber)}
-#fundUsed{color:var(--red)}
-
-.fundToolbar{
-  display:grid;gap:12px;
-  padding:14px;
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  box-shadow:var(--shadow-1);
-}
-@media (min-width:760px){
-  .fundToolbar{grid-template-columns:1fr 1fr auto;align-items:start}
-  .fundToolbar > .primary{margin-top:19px}
-}
-.fundYearBox,.fundSearchBox{display:flex;flex-direction:column;gap:6px;min-width:0}
-.fundYearBox > label,.fundSearchBox > label{
-  font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
-}
-.fundYearBox small{font-size:11px;line-height:1.45}
-
-.fundPlayerCard{
-  padding:14px;margin-bottom:12px;
-  background:var(--surface-2);
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  animation:fadeUp .4s var(--ease-out) both;
-  transition:border-color var(--t) var(--ease),box-shadow var(--t) var(--ease),transform var(--t) var(--ease);
-}
-.fundPlayerCard:last-child{margin-bottom:0}
-.fundPlayerCard:hover{border-color:var(--line-strong);box-shadow:var(--shadow-1);transform:translateY(-2px)}
-.fundPlayerHead{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:14px}
-.fundPlayerHead h3{font-size:15px;overflow-wrap:anywhere}
-.fundPlayerHead small{display:block;margin-top:3px;font-size:11.5px;color:var(--muted)}
-.fundTotals{display:flex;gap:8px;flex:none}
-.fundTotals span{
-  padding:8px 12px;text-align:center;
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:var(--r-sm);
-}
-.fundTotals b{display:block;font-family:"Sora",sans-serif;font-size:14px;font-variant-numeric:tabular-nums}
-.fundTotals small{display:block;margin-top:2px;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.fundTotals span:first-child b{color:var(--green)}
-.fundTotals span:last-child b{color:var(--amber)}
-@media (max-width:520px){ .fundTotals{width:100%} .fundTotals span{flex:1} }
-
-.fundMonths{display:grid;gap:8px;grid-template-columns:repeat(2,1fr)}
-@media (min-width:420px){ .fundMonths{grid-template-columns:repeat(3,1fr)} }
-@media (min-width:760px){ .fundMonths{grid-template-columns:repeat(4,1fr)} }
-@media (min-width:1200px){ .fundMonths{grid-template-columns:repeat(6,1fr)} }
-
-.fundMonth{
-  position:relative;
-  display:flex;flex-direction:column;gap:3px;
-  padding:11px 10px;
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-left:3px solid var(--line-strong);
-  border-radius:var(--r-sm);
-  transition:transform var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),background var(--t-fast) var(--ease);
-  animation:popIn .35s var(--ease-out) both;
-}
-.fundMonth:hover{transform:translateY(-2px)}
-.fundMonth b{font-family:"Sora",sans-serif;font-size:13px;letter-spacing:.04em}
-.fundMonth span{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text-2)}
-.fundMonth small{font-size:10.5px;font-weight:700;letter-spacing:.04em}
-.fundMonth button{
-  margin-top:7px;min-height:34px;
-  font:700 11px/1 "Manrope",sans-serif;
-  color:var(--text-2);
-  background:var(--surface-2);
-  border:1px solid var(--line);
-  border-radius:9px;cursor:pointer;
-  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);
-}
-.fundMonth button:hover{background:var(--surface-3);color:var(--text)}
-.fundMonth button:active{transform:scale(.95)}
-
-.fundMonth.paid{border-left-color:var(--green);background:linear-gradient(180deg,var(--green-soft),transparent 70%)}
-.fundMonth.paid small{color:var(--green)}
-.fundMonth.paid button{color:var(--green);border-color:color-mix(in srgb,var(--green) 30%,transparent)}
-.fundMonth.pending{border-left-color:var(--amber);background:linear-gradient(180deg,var(--amber-soft),transparent 70%)}
-.fundMonth.pending small{color:var(--amber)}
-.fundMonth.pending button{color:#12201C;background:linear-gradient(140deg,var(--gold-2),var(--gold));border-color:transparent}
-.fundMonth.pending button:hover{filter:brightness(1.06);color:#12201C}
-.fundMonth.upcoming{opacity:.62}
-.fundMonth.upcoming small{color:var(--muted)}
-
-/* ---------- 19. FORMS -------------------------------------------------- */
+/* ---------- 18. FORMS -------------------------------------------------- */
 
 .panel.form{max-width:640px;margin:0 auto;width:100%;padding:22px}
 .panel.form h2{margin-bottom:16px;font-size:20px}
@@ -1161,7 +1034,7 @@ form label{
 }
 form .primary{margin-top:6px;width:100%}
 
-/* ---------- 20. MODALS -------------------------------------------------- */
+/* ---------- 19. MODALS -------------------------------------------------- */
 
 .modal{
   position:fixed;inset:0;z-index:120;
@@ -1225,7 +1098,7 @@ form .primary{margin-top:6px;width:100%}
 #playerDetail .actions{margin-top:14px}
 #playerDetail .actions .primary{flex:1}
 
-/* ---------- 21. TOASTS -------------------------------------------------- */
+/* ---------- 20. TOASTS -------------------------------------------------- */
 
 #toasts{
   position:fixed;z-index:200;
@@ -1254,7 +1127,7 @@ form .primary{margin-top:6px;width:100%}
 .toast.err::before{content:"!";color:var(--red);font-weight:800}
 .toast.info::before{content:"i";color:var(--gold);font-weight:800;font-style:italic}
 
-/* ---------- 22. REVEAL ON SCROLL ---------------------------------------- */
+/* ---------- 21. REVEAL ON SCROLL ---------------------------------------- */
 
 .reveal{
   opacity:0;transform:translateY(16px);
@@ -1263,10 +1136,10 @@ form .primary{margin-top:6px;width:100%}
 }
 .reveal.in{opacity:1;transform:none}
 
-/* ---------- 23. EMPTY STATES -------------------------------------------- */
+/* ---------- 22. EMPTY STATES -------------------------------------------- */
 
 .muted{font-size:13px}
-.playerGrid > .muted,#top > .muted,#recent > .muted,#fundPlayers > .muted,#efficiency > .muted,#venueCards > .muted{
+.playerGrid > .muted,#top > .muted,#recent > .muted,#efficiency > .muted,#venueCards > .muted{
   grid-column:1/-1;
   padding:26px 16px;text-align:center;
   background:var(--surface-2);
@@ -1275,7 +1148,7 @@ form .primary{margin-top:6px;width:100%}
   color:var(--muted);
 }
 
-/* ---------- 24. MOTION PREFERENCES -------------------------------------- */
+/* ---------- 23. MOTION PREFERENCES -------------------------------------- */
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{
@@ -1287,7 +1160,7 @@ form .primary{margin-top:6px;width:100%}
   .reveal{opacity:1;transform:none}
 }
 
-/* ---------- 25. PRINT ---------------------------------------------------- */
+/* ---------- 24. PRINT ---------------------------------------------------- */
 
 @media print{
   .top,#side,#backdrop,.toolbar,.actions,#toasts,.heroButtons{display:none !important}

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#08201f">
-<meta name="description" content="Kohat Zalmi Cricket Performance Dashboard — players, matches, rankings, analytics and team funds.">
+<meta name="description" content="Kohat Zalmi Cricket Performance Dashboard — players, matches, rankings, analytics.">
 <title>Kohat Zalmi Cricket Performance Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +44,6 @@
     <button class="nav" data-page="venues"><span aria-hidden="true">📍</span> Venues</button>
     <button class="nav" data-page="leaders"><span aria-hidden="true">👑</span> Leaders</button>
     <button class="nav" data-page="team"><span aria-hidden="true">👥</span> Meet Our Team</button>
-    <button class="nav" data-page="funds"><span aria-hidden="true">💰</span> Funds</button>
     <p class="navLabel admin">Admin</p>
     <button class="nav admin" data-page="addPlayer"><span aria-hidden="true">➕</span> Add Player</button>
     <button class="nav admin" data-page="add"><span aria-hidden="true">📝</span> Add Performance</button>
@@ -233,40 +232,6 @@
     <div class="teamGrid" id="teamGrid"></div>
   </section>
 
-  <section class="page" id="funds">
-    <div class="fundHero">
-      <div><small>KOHAT ZALMI FINANCE CENTER</small><h2>Player Funds</h2><p>Every player contributes <b>Rs 200 per month</b>. Track paid, pending, total, used and available funds.</p></div>
-      <div class="fundHeroBadge">Rs 200<br><span>MONTHLY / PLAYER</span></div>
-    </div>
-    <div class="stats fundStats">
-      <div class="stat"><div class="label">Expected Funds</div><div class="value" id="fundExpected">Rs 0</div><small>Active fund period</small></div>
-      <div class="stat"><div class="label">Collected Funds</div><div class="value" id="fundCollected">Rs 0</div><small>Paid by players</small></div>
-      <div class="stat"><div class="label">Pending Funds</div><div class="value" id="fundPending">Rs 0</div><small>From fund start date</small></div>
-      <div class="stat"><div class="label">Total Used</div><div class="value" id="fundUsed">Rs 0</div><small>Team expenses</small></div>
-      <div class="stat"><div class="label">Available Funds</div><div class="value" id="fundAvailable">Rs 0</div><small>Collected minus used</small></div>
-    </div>
-    <div class="fundToolbar">
-      <div class="fundYearBox">
-        <label for="fundYear">Fund Year</label>
-        <select id="fundYear"></select>
-        <small class="muted">Collection starts from the first day of next month. Earlier months are not counted as pending.</small>
-      </div>
-      <div class="fundSearchBox">
-        <label for="fundSearch">Search Player</label>
-        <input id="fundSearch" type="search" placeholder="Search name or jersey number..." autocomplete="off">
-      </div>
-      <button id="addExpense" class="primary admin">+ Add Expense</button>
-    </div>
-    <div class="panel">
-      <div class="sectionHead"><div><h3>Monthly Player Funds</h3><p class="muted">Green = paid • Orange = pending • Grey = not active. The fund system starts from the first day of next month.</p></div></div>
-      <div id="fundPlayers"></div>
-    </div>
-    <div class="panel expensePanel">
-      <div class="sectionHead"><div><h3>Team Expenses</h3><p class="muted">Record money used by Kohat Zalmi to calculate available funds.</p></div></div>
-      <div class="table"><table><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Action</th></tr></thead><tbody id="expenseTable"></tbody></table></div>
-    </div>
-  </section>
-
   <section class="page" id="addPlayer">
     <div class="panel form">
       <h2>Add Player</h2>
@@ -360,17 +325,6 @@
       <label>Result<select name="result"><option>Won</option><option>Lost</option><option>Tied</option><option>No Result</option></select></label>
       <label>Score<input name="score"></label>
       <button class="primary">Save Changes</button>
-    </form>
-  </div>
-</div>
-
-<div class="modal" id="expenseModal" role="dialog" aria-modal="true" aria-labelledby="expenseTitle">
-  <div class="modalCard"><button class="x" id="closeExpense" aria-label="Close">×</button><h2 id="expenseTitle">Add Team Expense</h2>
-    <form id="expenseForm">
-      <label>Date<input name="date" type="date" required></label>
-      <label>Description<input name="description" placeholder="Ground fee, ball, jersey..." required></label>
-      <label>Amount (Rs)<input name="amount" type="number" min="1" step="1" required></label>
-      <button class="primary">Save Expense</button>
     </form>
   </div>
 </div>

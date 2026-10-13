@@ -15,11 +15,9 @@ Files:
 Supabase:
 - Project URL and publishable key are unchanged.
 - Owner/admin UUID: f62ca7bc-486d-462f-92dd-6415e0e90973
-- Tables used: public."kohat zalmi", public.matches, public.player_funds,
-  public.fund_expenses — none were renamed or altered.
+- Tables used by this website version: public."kohat zalmi", public.matches.
 - RLS policies should allow public SELECT and owner-only INSERT/UPDATE/DELETE.
-- No database changes are required for this update. SUPABASE_FUNDS_SQL.sql is
-  included only for reference; if you already ran it, do NOT run it again.
+- This version removes the Funds page from the website UI. Existing Supabase fund tables are NOT deleted by this ZIP.
 
 Important: never put a Supabase service_role/secret key in this website. The
 publishable key is intended for browser use with RLS.
@@ -35,14 +33,14 @@ Design
   plus a matching professional light theme.
 - Fixed header with brand crest, sidebar navigation grouped into
   Team / Insights / Admin, and a clear Visitor / Admin badge.
-- Redesigned hero, player cards, ranking rows, match cards, fund cards,
-  leaders cards, forms and modals.
+- Redesigned hero, player cards, ranking rows, match cards, leaders cards,
+  forms and modals.
 - Typography: Sora for headings, Manrope for body text (Google Fonts, with
   system font fallbacks if the fonts fail to load).
 
 Animation (pure CSS + a little IntersectionObserver — no libraries)
 - Page entrance fades, staggered card reveals on scroll.
-- Animated number counters on dashboard and fund totals.
+- Animated number counters on the dashboard.
 - Animated progress bars and a conic-gradient win-rate ring.
 - Hover lift on cards, photo zoom, light sweep on buttons and leader cards.
 - Animated hamburger, sliding mobile drawer with backdrop blur.
@@ -53,7 +51,7 @@ Animation (pure CSS + a little IntersectionObserver — no libraries)
 Mobile
 - Designed from 360px up; verified at 360, 390 and 1440px with no horizontal
   scrolling on any page.
-- Tables (matches, rankings, venues, expenses) become readable cards on small
+- Tables (matches, rankings, venues) become readable cards on small
   screens instead of scrolling sideways.
 - Touch targets are at least 38-46px.
 
@@ -80,3 +78,10 @@ Small improvements (nothing removed)
 
 Tested with a headless browser at 360px, 390px and 1440px across every page:
 zero JavaScript console errors, zero horizontal overflow.
+
+
+LATEST UPDATE
+- Added Shahab to Meet Our Team.
+- Shahab role: Right Hand Batsman.
+- Added SUPABASE_MATCHES_PKEY_FIX.sql for the duplicate matches_pkey database issue.
+- Match saving also retries with a safe primary-key value when the old sequence is behind.
