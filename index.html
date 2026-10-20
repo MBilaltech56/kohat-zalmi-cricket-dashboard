@@ -3,16 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08201f">
+<meta name="theme-color" content="#0c0614">
 <meta name="description" content="Kohat Zalmi Cricket Performance Dashboard — players, matches, rankings, analytics.">
 <title>Kohat Zalmi Cricket Performance Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' x2='1'%3E%3Cstop offset='.5' stop-color='rgb(255,111,174)'/%3E%3Cstop offset='.5' stop-color='rgb(255,201,51)'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M50 86C12 58 2 34 13 18C24 4 43 8 50 24C57 8 76 4 87 18C98 34 88 58 50 86Z' fill='url(%23a)'/%3E%3Cpath d='M54 8L36 46H50L42 82L68 38H54L62 8Z' fill='white'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=Shippori+Mincho:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<!-- ===== 8-second splash screen: Kohat Zalmi — We Are Friends ===== -->
+<div id="splash" role="img" aria-label="Kohat Zalmi — We Are Friends">
+  <div class="spSky"></div>
+  <i class="spKanji" aria-hidden="true">友</i>
+  <div class="spRings" aria-hidden="true"><i></i><i></i><i></i></div>
+  <svg class="spBolt" viewBox="0 0 120 200" aria-hidden="true"><defs><linearGradient id="spBoltG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffc933"/></linearGradient></defs><path fill="url(#spBoltG)" d="M70 0L28 98H58L40 200L98 78H68L92 0Z"/></svg>
+  <div class="spFlash"></div>
+  <div class="spItems" id="spItems" aria-hidden="true"></div>
+  <div class="spCenter" aria-hidden="true">
+    <div class="spEmblem">
+      <svg class="spHalf L" viewBox="0 0 100 90"><defs><linearGradient id="spGL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb3d3"/><stop offset="1" stop-color="#ff4f98"/></linearGradient></defs><path fill="url(#spGL)" d="M50 86C12 58 2 34 13 18C24 4 43 8 50 24C57 8 76 4 87 18C98 34 88 58 50 86Z"/></svg>
+      <svg class="spHalf R" viewBox="0 0 100 90"><defs><linearGradient id="spGR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#ffb000"/></linearGradient></defs><path fill="url(#spGR)" d="M50 86C12 58 2 34 13 18C24 4 43 8 50 24C57 8 76 4 87 18C98 34 88 58 50 86Z"/></svg>
+      <svg class="spZig" viewBox="0 0 100 90"><path fill="#ffffff" d="M54 8L36 46H50L42 82L68 38H54L62 8Z"/></svg>
+      <i class="spBurst"></i><i class="spBurst b2"></i>
+    </div>
+    <div class="spTitle">
+      <span class="w w1"><b style="--i:0">K</b><b style="--i:1">O</b><b style="--i:2">H</b><b style="--i:3">A</b><b style="--i:4">T</b></span>
+      <span class="w w2"><b style="--i:5">Z</b><b style="--i:6">A</b><b style="--i:7">L</b><b style="--i:8">M</b><b style="--i:9">I</b></span>
+    </div>
+    <div class="spTag">We Are Friends</div>
+    <div class="spLine"></div>
+  </div>
+  <div class="spBlade" aria-hidden="true"><i></i></div>
+</div>
+<script>
+/* Splash: CSS runs the 8s timeline (exit fade at 7.3s - 8.0s); this just unlocks scroll and removes it. */
+(function () {
+  var s = document.getElementById("splash");
+  if (!s) return;
+  document.body.classList.add("splashOn");
+  setTimeout(function () {
+    document.body.classList.remove("splashOn");
+    if (s.parentNode) s.parentNode.removeChild(s);
+  }, 8100);
+})();
+</script>
+
+<!-- ===== Animated Demon Slayer background (Nezuko pink x Zenitsu thunder) ===== -->
+<div id="dsBg" aria-hidden="true">
+  <i class="dsAurora a1"></i><i class="dsAurora a2"></i>
+  <i class="dsPattern asa"></i><i class="dsPattern uro"></i>
+  <svg class="dsBolt b1" viewBox="0 0 120 200"><path d="M70 0L28 98H58L40 200L98 78H68L92 0Z"/></svg>
+  <svg class="dsBolt b2" viewBox="0 0 120 200"><path d="M70 0L28 98H58L40 200L98 78H68L92 0Z"/></svg>
+  <i class="dsFlash"></i>
+  <div class="dsItems" id="dsItems"></div>
+</div>
+<div id="dsFront" aria-hidden="true"></div>
+
 <a class="skip" href="#title">Skip to main content</a>
 
 <header class="top">
@@ -173,55 +222,84 @@
   </section>
 
   <section class="page" id="leaders">
-    <div class="leadersIntro modernLeaderIntro">
-      <div class="leaderIntroGlow"></div>
-      <div class="leaderIntroContent">
-        <span class="leaderKicker">KOHAT ZALMI • LEADERSHIP</span><span class="leaderTag">#BA56 👑</span>
-        <h2>THE LEADERS OF <b>KOHAT ZALMI</b></h2>
-        <p>One team. One vision. One family.</p>
+    <div class="ldHead">
+      <span class="ldKicker">KOHAT ZALMI • LEADERSHIP</span>
+      <h2 class="ldTitle">THE <b>LEADERS</b></h2>
+      <p class="ldSub">Thunder to strike. Bloom to guide. One team, one family.</p>
+      <div class="ldRule"><i></i><em class="ldDiamond"></em><i></i></div>
+    </div>
+
+    <div class="ldStage">
+      <article class="ldCard cap" tabindex="0" aria-label="M. Jibran, Captain">
+        <div class="ldTilt">
+          <div class="ldFrame"></div>
+          <div class="ldInner">
+            <img class="ldPhoto" src="assets/jibran.jpg" alt="M. Jibran, captain of Kohat Zalmi" loading="lazy">
+            <div class="ldShade"></div>
+            <div class="ldNum" aria-hidden="true">07</div>
+            <div class="ldFx" aria-hidden="true"><svg class="ldBolt" viewBox="0 0 120 200" aria-hidden="true"><path d="M70 0L28 98H58L40 200L98 78H68L92 0Z"/></svg><svg class="ldBolt b2" viewBox="0 0 120 200" aria-hidden="true"><path d="M70 0L28 98H58L40 200L98 78H68L92 0Z"/></svg><span class="sp s1"></span><span class="sp s2"></span><span class="sp s3"></span><span class="sp s4"></span><span class="sp s5"></span></div>
+            <div class="ldCorner tl"></div><div class="ldCorner tr"></div>
+            <div class="ldRole"><span aria-hidden="true">♛</span> CAPTAIN</div>
+            <div class="ldInfo">
+              <div class="ldJersey">#07</div>
+              <h3>M. Jibran</h3>
+              <p>Right-Hand Batsman • Right-Arm Fast Bowler</p>
+              <div class="ldTag">⚡ THUNDER BREATHING</div>
+            </div>
+            <div class="ldShine"></div>
+          </div>
+        </div>
+      </article>
+
+      <div class="ldLink" aria-hidden="true">
+        <i class="ldWire"></i>
+        <div class="ldBadge"><span>KZ</span></div>
+        <i class="ldWire"></i>
       </div>
-      <div class="leaderIntroMark" aria-hidden="true">♛</div>
-    </div>
-    <div class="modernLeaders">
-      <article class="modernLeaderCard captainCard">
-        <div class="leaderCardGlow"></div><div class="leaderCardShine"></div><div class="leaderPulse"></div><div class="leaderOrbit orbitOne"></div><div class="leaderOrbit orbitTwo"></div>
-        <div class="leaderRole"><span aria-hidden="true">♛</span> CAPTAIN</div>
-        <div class="modernLeaderPhoto"><img src="assets/bilal.jpg" alt="M. Bilal, captain of Kohat Zalmi" loading="lazy"><b aria-hidden="true">MB</b></div>
-        <div class="modernLeaderInfo"><h2>M. Bilal</h2><div class="jerseyNo">#56</div></div>
+
+      <article class="ldCard vice" tabindex="0" aria-label="M. Bilal, Vice Captain">
+        <div class="ldTilt">
+          <div class="ldFrame"></div>
+          <div class="ldInner">
+            <img class="ldPhoto" src="assets/bilal.jpg" alt="M. Bilal, vice captain of Kohat Zalmi" loading="lazy">
+            <div class="ldShade"></div>
+            <div class="ldNum" aria-hidden="true">56</div>
+            <div class="ldFx" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i></div>
+            <div class="ldCorner tl"></div><div class="ldCorner tr"></div>
+            <div class="ldRole"><span aria-hidden="true">★</span> VICE CAPTAIN</div>
+            <div class="ldInfo">
+              <div class="ldJersey">#56</div>
+              <h3>M. Bilal</h3>
+              <p>Right-Hand Batsman • Right-Arm Slow Wrist Spinner</p>
+              <div class="ldTag">🌸 BLOOM BREATHING</div>
+            </div>
+            <div class="ldShine"></div>
+          </div>
+        </div>
       </article>
-      <article class="modernLeaderCard viceCard">
-        <div class="leaderCardGlow"></div><div class="leaderCardShine"></div><div class="leaderPulse"></div><div class="leaderOrbit orbitOne"></div><div class="leaderOrbit orbitTwo"></div>
-        <div class="leaderRole"><span aria-hidden="true">★</span> VICE CAPTAIN</div>
-        <div class="modernLeaderPhoto"><img src="assets/jibran.jpg" alt="M. Jibran, vice captain of Kohat Zalmi" loading="lazy"><b aria-hidden="true">MJ</b></div>
-        <div class="modernLeaderInfo"><h2>M. Jibran</h2><div class="jerseyNo">#07</div></div>
-      </article>
     </div>
-    <div class="leaderFooterLine"><span></span><b>ONE TEAM • ONE DREAM</b><span></span></div>
-    <div class="leaderAccentRail" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+
+    <div class="ldFoot"><span></span><b>ONE TEAM • ONE DREAM</b><span></span></div>
   </section>
 
   <section class="page" id="team">
-    <div class="teamHero">
-      <div class="teamHeroAura auraOne"></div>
-      <div class="teamHeroAura auraTwo"></div>
-      <div class="teamHeroCopy">
-        <span class="teamKicker">KOHAT ZALMI • THE SQUAD</span>
-        <h2>MEET OUR <b>TEAM</b></h2>
-        <p>Built by discipline. Driven by passion. United as one Kohat Zalmi family.</p>
-        <div class="teamHeroRule"><i></i><span>ONE TEAM • ONE DREAM</span><i></i></div>
+    <div class="tmHero">
+      <i class="tmCrack" aria-hidden="true"></i>
+      <div class="tmWord" aria-hidden="true">TEAM</div>
+      <div class="tmCopy">
+        <span class="tmKicker">KOHAT ZALMI • THE SQUAD</span>
+        <h2 class="tmTitle"><span class="t1">MEET</span> <span class="t2">OUR</span> <span class="t3">TEAM</span></h2>
+        <p class="tmSub">Built by discipline. Driven by passion. United as one Kohat Zalmi family.</p>
+        <div class="tmChips">
+          <span class="chip pk"><b id="tmCount">15</b> Players</span>
+          <span class="chip yl"><b>1</b> Captain</span>
+          <span class="chip pk"><b>1</b> Vice Captain</span>
+          <span class="chip yl"><b>1</b> Family</span>
+        </div>
       </div>
-      <div class="teamLeadersHero">
-        <article class="heroLeader captainHero">
-          <div class="heroLeaderGlow"></div>
-          <div class="heroLeaderPhoto"><img src="assets/team/M.Bilal-RH_Slow_Wrist_Spiner-RH_Batsman-Captain.png" alt="M. Bilal, Captain" loading="eager"></div>
-          <div class="heroLeaderText"><span>CAPTAIN • #56</span><h3>M. Bilal</h3><small>Right-Hand Batsman • Right-Arm Slow Wrist Spinner</small></div>
-        </article>
-        <div class="heroVs" aria-hidden="true">VS</div>
-        <article class="heroLeader viceHero">
-          <div class="heroLeaderGlow"></div>
-          <div class="heroLeaderPhoto"><img src="assets/team/M.Jibran-RA_Fast_Bowler-RH_Batsman-Vice_Captain.png" alt="M. Jibran, Vice Captain" loading="eager"></div>
-          <div class="heroLeaderText"><span>VICE CAPTAIN • #07</span><h3>M. Jibran</h3><small>Right-Hand Batsman • Right-Arm Fast Bowler</small></div>
-        </article>
+      <div class="tmReel" aria-hidden="true">
+        <div class="tmRow r1"><div class="tmTrack" id="tmTrack1"></div></div>
+        <div class="tmRow r2"><div class="tmTrack" id="tmTrack2"></div></div>
       </div>
     </div>
 
@@ -335,6 +413,7 @@
 
 <div id="toasts" aria-live="polite"></div>
 
+<script src="effects.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

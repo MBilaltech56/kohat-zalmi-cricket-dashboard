@@ -146,8 +146,8 @@ const TEAM_ROSTER = [
   {name:"Adnan", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Adnan-RA_Fast_Bowler-RH_Batsman.png"},
   {name:"Shahzad", role:"All-Rounder", bowling:"Right-Arm Off-Break Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Shahzad-RA_Off_Break-RH_Batsman.png"},
   {name:"Naimat", role:"Bowler", bowling:"Right-Arm Leg-Break Bowler", batting:"", photo:"assets/team/Naimat-RA_Leg_Break.png"},
-  {name:"M. Bilal", role:"All-Rounder", bowling:"Right-Arm Slow Wrist Spinner", batting:"Right-Hand Batsman", captain:"Captain", jersey:"56", photo:"assets/team/M.Bilal-RH_Slow_Wrist_Spiner-RH_Batsman-Captain.png"},
-  {name:"M. Jibran", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", captain:"Vice Captain", jersey:"07", photo:"assets/team/M.Jibran-RA_Fast_Bowler-RH_Batsman-Vice_Captain.png"},
+  {name:"M. Bilal", role:"All-Rounder", bowling:"Right-Arm Slow Wrist Spinner", batting:"Right-Hand Batsman", captain:"Vice Captain", jersey:"56", photo:"assets/team/M.Bilal-RH_Slow_Wrist_Spiner-RH_Batsman-Vice_Captain.png"},
+  {name:"M. Jibran", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", captain:"Captain", jersey:"07", photo:"assets/team/M.Jibran-RA_Fast_Bowler-RH_Batsman-Captain.png"},
   {name:"Maidad", role:"Wicket Keeper • Batsman", bowling:"", batting:"Batsman", photo:"assets/team/Maidad-WK_Batsman.png"},
   {name:"SanaUllah", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/SanaUllah-RA_Fast_Bowler.png"},
   {name:"Shahab", role:"Batsman", bowling:"", batting:"Right-Hand Batsman", photo:"assets/team/Shahab-RH_Batsman.jpg"}
@@ -157,13 +157,14 @@ function renderTeam() {
   const grid = $("#teamGrid");
   if (!grid) return;
   $("#teamCount").textContent = TEAM_ROSTER.length + " Players";
+  if (typeof buildTeamReel === "function") buildTeamReel(TEAM_ROSTER);
   grid.innerHTML = TEAM_ROSTER.map((p,i) => `
     <article class="teamPlayerCard" style="--delay:${Math.min(i,11)*55}ms">
       <div class="teamCardGlow"></div>
       <div class="teamPhotoFrame">
         <div class="teamPhotoHalo"></div>
         <img src="${p.photo}" alt="${esc(p.name)}" loading="lazy">
-        ${p.captain ? `<span class="teamCaptainBadge">${esc(p.captain)}</span>` : ""}
+        ${p.captain ? `<span class="teamCaptainBadge ${p.captain === "Captain" ? "isCaptain" : "isVice"}">${esc(p.captain)}</span>` : ""}
       </div>
       <div class="teamCardBody">
         <div class="teamRole">${esc(p.role)}</div>
@@ -458,7 +459,7 @@ function applyTheme(night) {
   $("#themeIcon").textContent = night ? "☀️" : "🌙";
   $("#theme").setAttribute("aria-label", night ? "Switch to day mode" : "Switch to night mode");
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", night ? "#050A09" : "#EEF2F1");
+  if (meta) meta.setAttribute("content", night ? "#0c0614" : "#fff1f7");
 }
 
 // Saved preference is respected exactly; night is the default when nothing is saved.

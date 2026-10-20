@@ -85,3 +85,31 @@ LATEST UPDATE
 - Shahab role: Right Hand Batsman.
 - Added SUPABASE_MATCHES_PKEY_FIX.sql for the duplicate matches_pkey database issue.
 - Match saving also retries with a safe primary-key value when the old sequence is behind.
+
+
+DEMON SLAYER UPDATE  (Nezuko x Zenitsu love-story theme)
+---------------------------------------------------------
+1. Roles reversed everywhere: M. Jibran is now CAPTAIN (#07) and M. Bilal is
+   now VICE CAPTAIN (#56) - Leaders page, Meet Our Team hero, player badges.
+   The two team photos were renamed (...-Captain.png / ...-Vice_Captain.png).
+2. New theme: Nezuko sakura-pink + Zenitsu thunder-yellow, hemp-leaf and
+   triangle haori patterns, gradient-border animated cards, falling petals,
+   hearts and thunder sparks, lightning flashes. Day and Night modes both
+   re-coloured. All code is in the end of style.css (section DS-1 .. DS-12)
+   and in the new file effects.js.
+3. 8-second splash screen: "KOHAT ZALMI - We Are Friends" (index.html top,
+   styles in style.css section DS-11). Fades out between 7.3s and 8.0s.
+
+Upload ALL files (index.html, app.js, style.css, effects.js, assets/) to GitHub.
+
+LEADERS + TEAM HERO REDESIGN
+- Leaders page rebuilt: two large animated trading-style cards. Captain M. Jibran = Zenitsu
+  thunder (yellow, lightning flashes, sparks). Vice Captain M. Bilal = Nezuko bloom (pink,
+  falling petals). Rotating light border, breathing glow, floating motion, shine sweep,
+  and a 3D tilt that follows the mouse on desktop. A heart-bolt links the two cards.
+- Meet Our Team hero rebuilt from scratch: big MEET OUR TEAM title, thunder crack, haori
+  patterns, count chips, and two moving rows of every squad member's photo.
+  Captain/Vice photos are NOT in this hero (they live on the Leaders page).
+- Files changed: index.html, style.css (DS-13, DS-14), effects.js, app.js (one line).
+
+- Leaders page: heart between Captain and Vice Captain replaced by a neutral pink/yellow KZ team badge.
