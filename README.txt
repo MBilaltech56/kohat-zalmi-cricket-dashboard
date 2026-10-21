@@ -84,7 +84,7 @@ LATEST UPDATE
 - Added Shahab to Meet Our Team.
 - Shahab role: Right Hand Batsman.
 - Added SUPABASE_MATCHES_PKEY_FIX.sql for the duplicate matches_pkey database issue.
-- Match saving also retries with a safe primary-key value when the old sequence is behind.
+- Match saving does not send an ID; Supabase generates it from the identity sequence.
 
 
 DEMON SLAYER UPDATE  (Nezuko x Zenitsu love-story theme)
@@ -123,7 +123,7 @@ plus zero defaults for required numeric summary fields.
 
 Before uploading this ZIP:
 1. Back up `public."kohat zalmi"` and `public.matches` to private CSV files.
-2. In Supabase SQL Editor, run SUPABASE_SETUP_UNDO_REDO.sql once.
+2. In Supabase SQL Editor, run SUPABASE_SETUP_UNDO_REDO.sql once. This restarts the existing match identity sequence after the highest saved match ID and sets its cache to 1; it does not delete existing match records.
 3. Upload ALL files and folders from this ZIP to the existing GitHub repository,
    replacing matching files.
 4. Wait for GitHub Pages to publish, then open the site and hard-refresh.
