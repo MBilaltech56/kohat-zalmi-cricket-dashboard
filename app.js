@@ -8,7 +8,7 @@ const SUPABASE_KEY = "sb_publishable_yKCdQBSPvkisSWncHbGmBg_-6u9DEyP";
 const OWNER_UID = "f62ca7bc-486d-462f-92dd-6415e0e90973";
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let state = { players: [], matches: [] };
+let state = { players: [], matches: [], performanceRecords: [] };
 let isAdmin = false;
 
 const $ = s => document.querySelector(s);
@@ -128,9 +128,107 @@ function render() {
   $("#recent").innerHTML = [...m].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 5)
     .map((x, i) => `<div class="performer" style="animation-delay:${i * 60}ms"><div class="grow"><b>${esc(x.opponent)}</b><small>${esc(x.date)} • ${esc(x.venue)}</small></div><b>${esc(x.result)}</b></div>`).join("") || `<div class="muted">No matches yet.</div>`;
 
-  renderPlayers(); renderMatches(); renderRankings(); renderAnalytics(); renderVenues(); renderTeam();
+  renderPlayers(); renderMatches(); renderRankings(); renderAnalytics(); renderVenues(); renderTeam(); renderPerformanceHistory();
   fillPlayerSelect(); updateAccessUI();
   animateNumbers(); observeReveals();
+}
+
+/* ---------- Individual performance history + Undo/Redo ------------------ */
+function performanceValues(rec) {
+  return {
+    matches: 1, runs: n(rec.runs), balls: n(rec.balls),
+    dismissals: n(rec.dismissed), overs: n(rec.overs),
+    conceded: n(rec.conceded), wickets: n(rec.wickets)
+  };
+}
+function applyPerformanceDelta(player, rec, sign) {
+  if (!player) return;
+  const v = performanceValues(rec);
+  ["matches","runs","balls","dismissals","overs","conceded","wickets"].forEach(k => {
+    player[k] = n(player[k]) + sign * n(v[k]);
+    if (Math.abs(player[k]) < 0.000001) player[k] = 0;
+  });
+}
+async function persistPlayerTotals(player) {
+  const payload = {
+    matches: n(player.matches), runs: n(player.runs), balls: n(player.balls),
+    dismissals: n(player.dismissals), overs: n(player.overs),
+    conceded: n(player.conceded), wickets: n(player.wickets)
+  };
+  const { data, error } = await db.from("kohat zalmi").update(payload).eq("id", player.id).select().single();
+  if (error) throw error;
+  Object.assign(player, data);
+}
+function renderPerformanceHistory() {
+  const host = $("#performanceHistory");
+  if (!host) return;
+  const records = [...(state.performanceRecords || [])].sort((a,b) => Number(b.id) - Number(a.id));
+  host.innerHTML = records.length ? records.map(rec => {
+    const player = state.players.find(p => String(p.id) === String(rec.player_id));
+    const status = rec.is_undone ? '<span class="perfStatus undone">Undone</span>' : '<span class="perfStatus active">Active</span>';
+    return `<article class="perfRecord ${rec.is_undone ? "isUndone" : ""}">
+      <div class="perfRecordMain"><b>${esc(rec.player_name || player?.name || "Unknown player")}</b><small>${esc(rec.match_date || "Date not set")} · ${n(rec.runs)} runs · ${n(rec.wickets)} wickets · ${n(rec.overs)} overs</small></div>
+      ${status}
+      ${isAdmin ? `<div class="actions">
+        <button class="action" onclick="togglePerformance('${String(rec.id)}', ${rec.is_undone ? "false" : "true"})">${rec.is_undone ? "Redo" : "Undo"}</button>
+        <button class="action" onclick="editPerformance('${String(rec.id)}')">Edit</button>
+        <button class="action danger" onclick="deletePerformance('${String(rec.id)}')">Delete</button>
+      </div>` : ""}
+    </article>`;
+  }).join("") : '<p class="muted">No individual performance records yet. New performances will appear here.</p>';
+}
+async function togglePerformance(id, undo) {
+  if (!isAdmin) return toast("Admin login required.", "info");
+  const rec = state.performanceRecords.find(x => String(x.id) === String(id));
+  if (!rec || Boolean(rec.is_undone) === Boolean(undo)) return;
+  const player = state.players.find(p => String(p.id) === String(rec.player_id));
+  if (!player) return toast("Player for this performance was not found.", "err");
+  try {
+    applyPerformanceDelta(player, rec, undo ? -1 : 1);
+    await persistPlayerTotals(player);
+    const { data, error } = await db.from("player_performances").update({ is_undone: Boolean(undo) }).eq("id", rec.id).select().single();
+    if (error) {
+      applyPerformanceDelta(player, rec, undo ? 1 : -1);
+      await persistPlayerTotals(player);
+      return toast("Could not update performance history: " + error.message, "err");
+    }
+    Object.assign(rec, data);
+    render(); toast(undo ? "Performance undone." : "Performance restored with Redo.");
+  } catch (err) {
+    return toast("Could not update performance: " + err.message, "err");
+  }
+}
+function editPerformance(id) {
+  if (!isAdmin) return toast("Admin login required.", "info");
+  const rec = state.performanceRecords.find(x => String(x.id) === String(id));
+  if (!rec) return;
+  const f = $("#editPerformanceForm");
+  f.elements.namedItem("id").value = String(rec.id);
+  f.player.value = String(rec.player_id);
+  f.match_date.value = rec.match_date || "";
+  f.runs.value = n(rec.runs); f.balls.value = n(rec.balls);
+  f.dismissed.value = n(rec.dismissed); f.overs.value = n(rec.overs);
+  f.conceded.value = n(rec.conceded); f.wickets.value = n(rec.wickets);
+  openModal("#editPerformanceModal");
+}
+async function deletePerformance(id) {
+  if (!isAdmin) return toast("Admin login required.", "info");
+  const rec = state.performanceRecords.find(x => String(x.id) === String(id));
+  if (!rec || !confirm("Delete this individual performance record? This cannot be undone.")) return;
+  const player = state.players.find(p => String(p.id) === String(rec.player_id));
+  try {
+    if (!rec.is_undone && player) {
+      applyPerformanceDelta(player, rec, -1);
+      await persistPlayerTotals(player);
+    }
+    const { error } = await db.from("player_performances").delete().eq("id", rec.id);
+    if (error) {
+      if (!rec.is_undone && player) { applyPerformanceDelta(player, rec, 1); await persistPlayerTotals(player); }
+      return toast("Could not delete performance: " + error.message, "err");
+    }
+    state.performanceRecords = state.performanceRecords.filter(x => String(x.id) !== String(id));
+    render(); toast("Performance record deleted.");
+  } catch (err) { toast("Could not delete performance: " + err.message, "err"); }
 }
 
 /* ---------- Players ---------------------------------------------------- */
@@ -217,7 +315,7 @@ function editPlayer(id) {
   const p = state.players.find(x => String(x.id) === String(id));
   if (!p) return;
   const f = $("#editPlayerForm");
-  f.id.value = String(p.id);
+  f.elements.namedItem("id").value = String(p.id);
   f.name.value = p.name || "";
   f.jersey.value = p.jersey || "";
   f.role.value = p.role || "";
@@ -264,7 +362,7 @@ function editMatch(id) {
   const m = state.matches.find(x => String(x.id) === String(id));
   if (!m) return;
   const f = $("#editMatchForm");
-  f.id.value = String(m.id);
+  f.elements.namedItem("id").value = String(m.id);
   f.date.value = m.date || "";
   f.opponent.value = m.opponent || "";
   f.venue.value = m.venue || "";
@@ -355,7 +453,10 @@ function renderVenues() {
 /* ---------- Access / selects --------------------------------------------- */
 
 function fillPlayerSelect() {
-  $("#perfPlayer").innerHTML = state.players.map(p => `<option value="${String(p.id)}">${esc(p.name)} — ${esc(p.role)} (#${esc(p.jersey)})</option>`).join("") || `<option value="">No players — add a player first</option>`;
+  const opts = state.players.map(p => `<option value="${String(p.id)}">${esc(p.name)} — ${esc(p.role)} (#${esc(p.jersey)})</option>`).join("") || `<option value="">No players — add a player first</option>`;
+  if ($("#perfPlayer")) $("#perfPlayer").innerHTML = opts;
+  const editSelect = $("#editPerformanceForm select[name=" + '"player"' + "]");
+  if (editSelect) editSelect.innerHTML = opts;
 }
 
 function fillBestPlayerSelects() {
@@ -488,6 +589,7 @@ $("#closeMatch").addEventListener("click", () => closeModal("#matchModal"));
 $("#closePlayer").addEventListener("click", closePlayerModal);
 $("#closeEditPlayer").addEventListener("click", () => closeModal("#editPlayerModal"));
 $("#closeEditMatch").addEventListener("click", () => closeModal("#editMatchModal"));
+$("#closeEditPerformance").addEventListener("click", () => closeModal("#editPerformanceModal"));
 
 $("#addMatch").addEventListener("click", () => {
   if (isAdmin) { fillBestPlayerSelects(); openModal("#matchModal"); } else openAuth();
@@ -558,54 +660,76 @@ $("#perfForm").addEventListener("submit", async e => {
   const f = new FormData(e.target);
   const p = state.players.find(x => String(x.id) === String(f.get("player")));
   if (!p) return toast("Add a player first.", "err");
-  const u = {
-    matches: n(p.matches) + 1,
-    runs: n(p.runs) + n(f.get("runs")),
-    balls: n(p.balls) + n(f.get("balls")),
-    dismissals: n(p.dismissals) + n(f.get("dismissed")),
-    overs: n(p.overs) + n(f.get("overs")),
-    conceded: n(p.conceded) + n(f.get("conceded")),
-    wickets: n(p.wickets) + n(f.get("wickets"))
+  const rec = {
+    player_id: p.id, player_name: p.name,
+    match_date: f.get("match_date") || new Date().toISOString().slice(0,10),
+    runs: n(f.get("runs")), balls: n(f.get("balls")),
+    dismissed: n(f.get("dismissed")), overs: n(f.get("overs")),
+    conceded: n(f.get("conceded")), wickets: n(f.get("wickets")),
+    is_undone: false
   };
-  const { data, error } = await db.from("kohat zalmi").update(u).eq("id", p.id).select().single();
-  if (error) return toast("Could not save performance: " + error.message, "err");
-  Object.assign(p, data); e.target.reset(); render(); go("players"); toast("Performance saved successfully.");
+  const { data: saved, error } = await db.from("player_performances").insert([rec]).select().single();
+  if (error) return toast("Could not save performance record: " + error.message, "err");
+  applyPerformanceDelta(p, saved, 1);
+  try {
+    await persistPlayerTotals(p);
+  } catch (err) {
+    // Keep the record for recovery and clearly report the aggregate update failure.
+    return toast("Performance record saved, but player totals failed to update: " + err.message, "err");
+  }
+  state.performanceRecords.unshift(saved);
+  e.target.reset(); render(); go("add"); toast("Performance saved with Undo/Redo history.");
 });
 
 $("#matchForm").addEventListener("submit", async e => {
   e.preventDefault();
   if (!isAdmin) return openAuth();
   const f = new FormData(e.target);
+  const matchDate = f.get("date");
   const m = {
-    date: f.get("date"), opponent: f.get("opponent"), venue: f.get("venue"),
+    // Do not send id: Supabase identity column must generate it.
+    date: matchDate, match_date: matchDate,
+    opponent: f.get("opponent"), venue: f.get("venue"),
     result: f.get("result"), score: f.get("score"),
+    runs: 0, wickets: 0, overs: 0,
     best_batter: f.get("best_batter"),
-    best_batter_runs: f.get("best_batter_runs") ? n(f.get("best_batter_runs")) : null,
-    best_batter_balls: f.get("best_batter_balls") ? n(f.get("best_batter_balls")) : null,
+    best_batter_name: f.get("best_batter"),
+    best_batter_runs: f.get("best_batter_runs") ? n(f.get("best_batter_runs")) : 0,
+    best_batter_balls: f.get("best_batter_balls") ? n(f.get("best_batter_balls")) : 0,
     best_bowler: f.get("best_bowler"),
-    best_bowler_overs: f.get("best_bowler_overs") ? n(f.get("best_bowler_overs")) : null,
-    best_bowler_runs: f.get("best_bowler_runs") ? n(f.get("best_bowler_runs")) : null,
-    best_bowler_wickets: f.get("best_bowler_wickets") ? n(f.get("best_bowler_wickets")) : null
+    best_bowler_name: f.get("best_bowler"),
+    best_bowler_overs: f.get("best_bowler_overs") ? n(f.get("best_bowler_overs")) : 0,
+    best_bowler_runs: f.get("best_bowler_runs") ? n(f.get("best_bowler_runs")) : 0,
+    best_bowler_wickets: f.get("best_bowler_wickets") ? n(f.get("best_bowler_wickets")) : 0
   };
-  let { data, error } = await db.from("matches").insert([m]).select().single();
-
-  // Some older matches tables have a broken/behind primary-key sequence.
-  // If that happens, retry once with a guaranteed-next id based on the
-  // existing table type (numeric id or UUID id).
-  if (error && /duplicate key value violates unique constraint.*matches_pkey/i.test(error.message || "")) {
-    const existingIds = state.matches.map(x => x.id).filter(v => v !== null && v !== undefined && v !== "");
-    const numericIds = existingIds.map(Number).filter(Number.isFinite);
-    const numericMode = existingIds.length > 0 && numericIds.length === existingIds.length;
-    if (numericMode) {
-      m.id = Math.max(0, ...numericIds) + 1;
-      ({ data, error } = await db.from("matches").insert([m]).select().single());
-    } else if (window.crypto?.randomUUID) {
-      m.id = crypto.randomUUID();
-      ({ data, error } = await db.from("matches").insert([m]).select().single());
-    }
-  }
+  const { data, error } = await db.from("matches").insert([m]).select().single();
   if (error) return toast("Could not save match: " + error.message, "err");
   state.matches.push(data); e.target.reset(); closeModal("#matchModal"); render(); go("matches"); toast("Match saved successfully.");
+});
+
+$("#editPerformanceForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!isAdmin) return openAuth();
+  const f = new FormData(e.target);
+  const rec = state.performanceRecords.find(x => String(x.id) === String(f.get("id")));
+  const newPlayer = state.players.find(x => String(x.id) === String(f.get("player")));
+  if (!rec || !newPlayer) return toast("Performance or player not found.", "err");
+  const oldPlayer = state.players.find(x => String(x.id) === String(rec.player_id));
+  const updated = {
+    player_id: newPlayer.id, player_name: newPlayer.name,
+    match_date: f.get("match_date") || new Date().toISOString().slice(0,10),
+    runs: n(f.get("runs")), balls: n(f.get("balls")),
+    dismissed: n(f.get("dismissed")), overs: n(f.get("overs")),
+    conceded: n(f.get("conceded")), wickets: n(f.get("wickets"))
+  };
+  const { data, error } = await db.from("player_performances").update(updated).eq("id", rec.id).select().single();
+  if (error) return toast("Could not edit performance: " + error.message, "err");
+  if (!rec.is_undone) {
+    if (oldPlayer) { applyPerformanceDelta(oldPlayer, rec, -1); await persistPlayerTotals(oldPlayer); }
+    applyPerformanceDelta(newPlayer, updated, 1); await persistPlayerTotals(newPlayer);
+  }
+  Object.assign(rec, data);
+  closeModal("#editPerformanceModal"); render(); toast("Performance updated.");
 });
 
 $("#editPlayerForm").addEventListener("submit", async e => {
@@ -635,7 +759,8 @@ $("#editMatchForm").addEventListener("submit", async e => {
   const m = state.matches.find(x => String(x.id) === id);
   if (!m) return;
   const payload = {
-    date: f.get("date"), opponent: f.get("opponent"), venue: f.get("venue"),
+    date: f.get("date"), match_date: f.get("date"),
+    opponent: f.get("opponent"), venue: f.get("venue"),
     result: f.get("result"), score: f.get("score")
   };
   const { data, error } = await db.from("matches").update(payload).eq("id", id).select().single();
@@ -650,12 +775,14 @@ async function init() {
   try {
     const session = await db.auth.getSession();
     isAdmin = String(session.data.session?.user?.id || "") === OWNER_UID;
-    const [p, m] = await Promise.all([
+    const [p, m, perf] = await Promise.all([
       db.from("kohat zalmi").select("*").order("id", { ascending: true }),
-      db.from("matches").select("*").order("date", { ascending: false })
+      db.from("matches").select("*").order("date", { ascending: false }),
+      db.from("player_performances").select("*").order("id", { ascending: false })
     ]);
     if (p.error) console.error(p.error); else state.players = p.data || [];
     if (m.error) console.error(m.error); else state.matches = m.data || [];
+    if (perf.error) console.warn("Performance history unavailable:", perf.error.message); else state.performanceRecords = perf.data || [];
     updateAccessUI(); render();
   } catch (err) {
     console.error(err);

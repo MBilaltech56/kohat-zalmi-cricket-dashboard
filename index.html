@@ -328,6 +328,7 @@
       <h2>Add Performance</h2>
       <form id="perfForm">
         <label>Player<select id="perfPlayer" name="player"></select></label>
+        <label>Performance Date<input name="match_date" type="date"></label>
         <div class="formRow">
           <label>Runs<input name="runs" type="number" min="0" value="0"></label>
           <label>Balls<input name="balls" type="number" min="0" value="0"></label>
@@ -340,6 +341,10 @@
         <label>Wickets<input name="wickets" type="number" min="0" value="0"></label>
         <button class="primary">Save Performance</button>
       </form>
+      <div class="performanceHistoryPanel">
+        <div class="sectionHead"><div><h3>Performance History</h3><p class="muted">Admin can undo, redo, edit, or delete one individual record.</p></div></div>
+        <div id="performanceHistory" class="performanceHistory"><p class="muted">Loading performance history…</p></div>
+      </div>
     </div>
   </section>
 </main>
@@ -415,5 +420,21 @@
 
 <script src="effects.js"></script>
 <script src="app.js"></script>
+
+<div class="modal" id="editPerformanceModal" role="dialog" aria-modal="true" aria-labelledby="editPerformanceTitle">
+  <div class="modalCard"><button class="x" id="closeEditPerformance" aria-label="Close">×</button><h2 id="editPerformanceTitle">Edit Performance</h2>
+    <form id="editPerformanceForm">
+      <input type="hidden" name="id">
+      <label>Player<select name="player" required></select></label>
+      <label>Performance Date<input name="match_date" type="date" required></label>
+      <div class="formRow"><label>Runs<input name="runs" type="number" min="0" required></label><label>Balls<input name="balls" type="number" min="0" required></label></div>
+      <label>Dismissed<input name="dismissed" type="number" min="0" max="1" required></label>
+      <div class="formRow"><label>Overs<input name="overs" type="number" min="0" step=".1" required></label><label>Conceded<input name="conceded" type="number" min="0" required></label></div>
+      <label>Wickets<input name="wickets" type="number" min="0" required></label>
+      <button class="primary">Save Changes</button>
+    </form>
+  </div>
+</div>
+
 </body>
 </html>

@@ -113,3 +113,27 @@ LEADERS + TEAM HERO REDESIGN
 - Files changed: index.html, style.css (DS-13, DS-14), effects.js, app.js (one line).
 
 - Leaders page: heart between Captain and Vice Captain replaced by a neutral pink/yellow KZ team badge.
+
+
+MATCH SAVE + PERFORMANCE UNDO/REDO FIX
+--------------------------------------
+This version removes the client-side manual-ID retry for matches. The website
+lets Supabase generate the match ID and sends both `date` and `match_date`,
+plus zero defaults for required numeric summary fields.
+
+Before uploading this ZIP:
+1. Back up `public."kohat zalmi"` and `public.matches` to private CSV files.
+2. In Supabase SQL Editor, run SUPABASE_SETUP_UNDO_REDO.sql once.
+3. Upload ALL files and folders from this ZIP to the existing GitHub repository,
+   replacing matching files.
+4. Wait for GitHub Pages to publish, then open the site and hard-refresh.
+5. Log in as the owner admin and test adding one match and one performance.
+6. Test Undo, Redo, Edit, and Delete on a new test performance record.
+
+Individual performance history begins when the new table is installed and new
+performances are saved. Existing career totals already stored on player rows are
+preserved as-is; they cannot be split into individual historical records because
+the old website stored only cumulative totals. Do not use Undo on a pre-existing
+performance that has no individual history row.
+
+Funds tables are not modified or deleted by this SQL or this ZIP.
