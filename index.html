@@ -3,152 +3,124 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#05060f">
+<meta name="theme-color" content="#04121c">
 <meta name="description" content="Kohat Zalmi Cricket Performance Dashboard — players, matches, rankings, analytics.">
 <title>Kohat Zalmi Cricket Performance Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%2307111f'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='%23FFC933' stroke-width='5'/%3E%3Ccircle cx='50' cy='56' r='18' fill='%23f3ead0'/%3E%3Cellipse cx='50' cy='40' rx='32' ry='9' fill='%23f2c14e'/%3E%3Cpath d='M29 38C29 14 71 14 71 38Z' fill='%23f7d56b'/%3E%3Cpath d='M29.5 33H70.5L71 38H29Z' fill='%23d7263d'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
-<script>try{if(sessionStorage.getItem("kzIntroSeen")==="1")document.documentElement.className+=" kiSkip"}catch(e){}</script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Shippori+Mincho+B1:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<script>try{if(sessionStorage.getItem("kzIntroSeen")==="1")document.documentElement.className+=" gySkip"}catch(e){}</script>
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<!-- ===== 9-second opening splash: INFINITE VOID (Gojo Satoru tribute) =====
-     0-2s fade into the Void | 2-5s Blue + Red cursed energy gather around the silhouette | 5-7s Hollow Purple, crest + title | 7.3-9s progress hits 100%, purple blast reveals the site -->
-<div id="kzIntro" role="img" aria-label="Kohat Zalmi, We Are Friends. Loading.">
-  <div class="kiScene">
-    <div class="kiWorld" aria-hidden="true">
-      <div class="kiSky"></div>
-      <div class="kiGrid"></div>
-      <div class="kiStars" id="kiStars"></div>
-      <i class="kiRays"></i>
-      <div class="kiHex"></div>
-      <div class="kiSil"><svg viewBox="0 0 300 380" aria-hidden="true"><use href="#kzGojo"/></svg></div>
-      <i class="kiOrb blue"></i><i class="kiOrb red"></i>
-      <i class="kiPurple"></i><i class="kiShock"></i>
-      <div class="kiMotes" id="kiMotes"></div>
+<!-- ===== shared artwork (original vector art, inspired by Water Breathing): split-haori emblem, kikko pattern ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <pattern id="gyKikko" width="24" height="41.57" patternUnits="userSpaceOnUse">
+    <g fill="none" stroke="#e3a947" stroke-width="1.1">
+      <path d="M12 0L24 6.93V20.79L12 27.72L0 20.79V6.93Z"/>
+      <path d="M0 20.79L12 27.72V41.57L0 48.5"/>
+      <path d="M24 20.79L12 27.72V41.57L24 48.5"/>
+    </g>
+  </pattern>
+  <linearGradient id="gyInk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b2a3d"/><stop offset="1" stop-color="#061923"/></linearGradient>
+  <symbol id="gyEmblem" viewBox="0 0 120 120">
+    <clipPath id="gyClipL"><rect x="0" y="0" width="60" height="120"/></clipPath>
+    <clipPath id="gyClipR"><rect x="60" y="0" width="60" height="120"/></clipPath>
+    <polygon points="60,5 108,32.5 108,87.5 60,115 12,87.5 12,32.5" fill="url(#gyInk)"/>
+    <g clip-path="url(#gyClipL)"><polygon points="60,5 108,32.5 108,87.5 60,115 12,87.5 12,32.5" fill="#1b6b59"/></g>
+    <g clip-path="url(#gyClipR)">
+      <polygon points="60,5 108,32.5 108,87.5 60,115 12,87.5 12,32.5" fill="#6f2a20"/>
+      <polygon points="60,5 108,32.5 108,87.5 60,115 12,87.5 12,32.5" fill="url(#gyKikko)"/>
+    </g>
+    <polygon points="60,5 108,32.5 108,87.5 60,115 12,87.5 12,32.5" fill="none" stroke="#8fd6ff" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M26 66C35 48 52 48 60 62S84 78 94 56" fill="none" stroke="#eaf8ff" stroke-width="5.5" stroke-linecap="round"/>
+    <path d="M30 80C39 66 52 66 60 77S80 90 90 74" fill="none" stroke="#8fd6ff" stroke-width="3" stroke-linecap="round" opacity=".75"/>
+  </symbol>
+</defs></svg>
+
+<!-- ===== opening splash: DEAD CALM (about 6s, once per browser session) =====
+     0-1s a drop falls | 1-3s ripples + water ribbons | 2.4-4.3s emblem + KOHAT ZALMI | 4.8-6s water rises and reveals the site -->
+<div id="gyIntro" role="img" aria-label="Kohat Zalmi, We Are Friends. Loading.">
+  <div class="gyScene">
+    <div class="gySky"></div>
+    <svg class="gyRipples" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <ellipse class="rp" style="--k:0" cx="400" cy="226" rx="30" ry="8"/>
+      <ellipse class="rp" style="--k:1" cx="400" cy="226" rx="30" ry="8"/>
+      <ellipse class="rp" style="--k:2" cx="400" cy="226" rx="30" ry="8"/>
+      <ellipse class="rp" style="--k:3" cx="400" cy="226" rx="30" ry="8"/>
+    </svg>
+    <i class="gyDrop"></i>
+    <svg class="gyRibbons" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="gyRb" x1="0" x2="1"><stop offset="0" stop-color="#1c78c0" stop-opacity="0"/><stop offset=".5" stop-color="#8fd6ff"/><stop offset="1" stop-color="#1c78c0" stop-opacity="0"/></linearGradient></defs>
+      <path class="rb" style="--k:0" d="M-40 400C140 330 260 470 450 400S760 320 940 400S1120 450 1260 380"/>
+      <path class="rb" style="--k:1" d="M-40 440C160 380 290 510 480 440S790 370 960 440S1130 490 1260 430"/>
+      <path class="rb" style="--k:2" d="M-40 360C130 290 250 420 430 360S740 290 920 360S1110 410 1260 340"/>
+      <path class="rb" style="--k:3" d="M-40 480C170 430 300 540 500 480S810 420 980 480S1140 530 1260 470"/>
+    </svg>
+    <div class="gyCenter" aria-hidden="true">
+      <svg class="gyEmblem" viewBox="0 0 120 120"><use href="#gyEmblem"/></svg>
+      <div class="gyName"><span>Kohat</span> <span>Zalmi</span></div>
+      <i class="gyRule"></i>
+      <div class="gyTag">We are friends</div>
+      <div class="gyForm">Water Breathing, Eleventh Form: Dead Calm</div>
     </div>
-    <div class="kiShade" aria-hidden="true"></div>
-    <div class="kiTitleWrap" aria-hidden="true">
-      <div class="kiCrest"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="kiSg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9fe6ff"/><stop offset=".55" stop-color="#9b6bff"/><stop offset="1" stop-color="#ff5c7a"/></linearGradient></defs>
-<polygon points="50,4 90,27 90,73 50,96 10,73 10,27" fill="#070a24" stroke="url(#kiSg)" stroke-width="3.2" stroke-linejoin="round"/>
-<polygon points="50,14 82,32 82,68 50,86 18,68 18,32" fill="none" stroke="#6fa8ff" stroke-width="1.2" opacity=".6"/>
-<path d="M28 50C28 36 43 36 50 50C57 64 72 64 72 50C72 36 57 36 50 50C43 64 28 64 28 50Z" fill="none" stroke="#d8f3ff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="kiTitle"><span class="kiWd"><b style="--i:0">K</b><b style="--i:1">O</b><b style="--i:2">H</b><b style="--i:3">A</b><b style="--i:4">T</b></span><span class="kiWd"><b style="--i:5">Z</b><b style="--i:6">A</b><b style="--i:7">L</b><b style="--i:8">M</b><b style="--i:9">I</b></span></div>
-      <i class="kiRule"></i>
-      <div class="kiTag">We Are Friends</div>
-      <i class="kiFlare"></i>
-    </div>
-    <div class="kiProg" aria-hidden="true">
-      <div class="kiProgTop"><span>INFINITE VOID</span><span class="kiPct"></span></div>
-      <div class="kiTrack"><i class="kiFill"></i></div>
-    </div>
-    <button type="button" class="kiSkipBtn" id="kiSkipBtn">Skip intro</button>
-    <div class="kiFade" aria-hidden="true"></div>
+    <div class="gyProg" aria-hidden="true"><span>Loading</span><i class="gyTrack"><b></b></i></div>
+    <button type="button" class="gySkipBtn" id="gySkipBtn">Skip intro</button>
   </div>
-  <div class="kiWave" aria-hidden="true"></div>
+  <div class="gyRise" aria-hidden="true"></div>
 </div>
 <script>
-/* Opening splash controller (Infinite Void). CSS runs the whole 9s timeline; this only builds particles,
-   unlocks the page and removes the splash. Plays once per browser session (see the <head> check). */
+/* Opening splash controller. CSS runs the timeline; this only unlocks the page and removes the splash.
+   Plays once per browser session (see the <head> check). */
 (function () {
-  var root = document.getElementById("kzIntro");
+  var root = document.getElementById("gyIntro");
   if (!root) return;
   var de = document.documentElement, body = document.body;
-  if (de.classList.contains("kiSkip")) { root.parentNode.removeChild(root); return; }
+  if (de.classList.contains("gySkip")) { root.parentNode.removeChild(root); return; }
   var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var small = window.matchMedia && matchMedia("(max-width: 700px)").matches;
   try { sessionStorage.setItem("kzIntroSeen", "1"); } catch (e) {}
-  body.classList.add("splashOn", "kiLock");
-  if (calm) root.classList.add("kiCalm");
-  if (window.CSS && CSS.registerProperty) root.classList.add("kiPctOk");
-
-  function rnd(a, b) { return a + Math.random() * (b - a); }
-  function fill(id, n, mk) {
-    var host = document.getElementById(id); if (!host) return;
-    var f = document.createDocumentFragment();
-    for (var i = 0; i < n; i++) f.appendChild(mk(i));
-    host.appendChild(f);
-  }
-  if (!calm) {
-    fill("kiStars", small ? 22 : 40, function () {
-      var s = document.createElement("i");
-      s.style.cssText = "--x:" + rnd(0, 100).toFixed(1) + "%;--y:" + rnd(0, 52).toFixed(1) + "%;--s:" + rnd(1.5, 3.6).toFixed(1) + "px;--d:" + rnd(0, 4).toFixed(1) + "s";
-      return s;
-    });
-    fill("kiMotes", small ? 16 : 30, function () {
-      var m = document.createElement("i");
-      m.style.cssText = "--x:" + rnd(0, 100).toFixed(1) + "%;--s:" + rnd(2, 5).toFixed(1) + "px;--dur:" + rnd(7, 13).toFixed(1) + "s;--dl:" + (-rnd(0, 12)).toFixed(1) + "s;--dx:" + rnd(-9, 9).toFixed(1) + "vmin;--o:" + rnd(.35, .9).toFixed(2);
-      if (Math.random() < .45) m.className = "g";
-      return m;
-    });
-  }
-
+  body.classList.add("splashOn", "gyLock");
+  if (calm) root.classList.add("gyCalm");
   var done = false;
-  function reveal() { body.classList.remove("splashOn"); }       /* background + page start moving under the wave */
+  function reveal() { body.classList.remove("splashOn"); }
   function finish() {
     if (done) return; done = true;
-    body.classList.remove("splashOn", "kiLock");
+    body.classList.remove("splashOn", "gyLock");
     if (root.parentNode) root.parentNode.removeChild(root);
   }
-  var wave = root.querySelector(".kiWave");
-  if (wave) wave.addEventListener("animationend", function (e) { if (e.animationName === "kiWaveRun") finish(); });
-  setTimeout(reveal, calm ? 1800 : 8150);
-  setTimeout(finish, calm ? 2600 : 9100);          /* safety net: never block the site */
-  var skip = document.getElementById("kiSkipBtn");
+  var rise = root.querySelector(".gyRise");
+  if (rise) rise.addEventListener("animationend", function (e) { if (e.animationName === "gyRiseRun") finish(); });
+  setTimeout(reveal, calm ? 1600 : 5500);
+  setTimeout(finish, calm ? 2300 : 7000);          /* safety net: never block the site */
+  var skip = document.getElementById("gySkipBtn");
   if (skip) skip.addEventListener("click", function () {
-    root.classList.add("kiLeave"); reveal(); setTimeout(finish, 450);
+    root.classList.add("gyLeave"); reveal(); setTimeout(finish, 450);
   });
 })();
 </script>
 
-<!-- ===== page-change splash: LIMITLESS (1.2s) - cursed-energy sweep + hex sigil + destination title ===== -->
-<div id="kzWarp" aria-hidden="true">
-  <i class="kwP" style="--k:0;--c:#e6f6ff"></i><i class="kwP" style="--k:1;--c:#4cc9ff"></i><i class="kwP" style="--k:2;--c:#6a30de"></i><i class="kwP" style="--k:3;--c:#070618"></i>
-  <div class="kwSwirl"></div>
-  <i class="kwStreak" style="--y:18%;--w:46vw;--dl:0s"></i><i class="kwStreak" style="--y:34%;--w:62vw;--dl:.04s"></i><i class="kwStreak" style="--y:52%;--w:38vw;--dl:.02s"></i><i class="kwStreak" style="--y:67%;--w:58vw;--dl:.06s"></i><i class="kwStreak" style="--y:82%;--w:44vw;--dl:.01s"></i>
-  <div class="kwStage">
-    <svg class="kwCompass" viewBox="0 0 200 200" aria-hidden="true"><use href="#kzCompass"/></svg>
-    <div class="kwTitle" id="kwTitle"></div>
-    <i class="kwLine"></i>
+<!-- ===== page-change transition (1.2s): water rises, destination title ===== -->
+<div id="gyWarp" aria-hidden="true">
+  <div class="gyWv gyWv1"></div><div class="gyWv gyWv2"></div>
+  <div class="gyWStage">
+    <svg class="gyWMark" viewBox="0 0 120 120"><use href="#gyEmblem"/></svg>
+    <div class="gyWTitle" id="gyTitle"></div>
+    <i class="gyWLine"></i>
   </div>
 </div>
 
-<!-- shared artwork (original vector art): Gojo-inspired silhouette + Limitless hex sigil -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
-  <linearGradient id="gjHair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#a9b9ff"/></linearGradient>
-  <symbol id="kzGojo" viewBox="0 0 300 380">
-    <path d="M6 380L32 304Q60 268 112 256H188Q240 268 268 304L294 380Z" fill="#090c26"/>
-    <path d="M100 232L90 304L150 286L210 304L200 232Q150 262 100 232Z" fill="#141944" stroke="#3a4aa8" stroke-width="1.4"/>
-    <rect x="126" y="204" width="48" height="54" fill="#1a2052"/>
-    <path d="M103 126Q100 214 150 240Q200 214 197 126Z" fill="#2a3166"/>
-    <path d="M96 152L78 104L102 118L94 60L122 94L128 34L148 86L164 24L174 88L198 44L196 104L224 88L206 154L196 130Q150 96 104 130Z" fill="url(#gjHair)" stroke="#7fd0ff" stroke-width="1.6" stroke-linejoin="round"/>
-    <path d="M110 118L102 158L124 128ZM148 108L142 154L164 116ZM186 120L198 158L198 124Z" fill="url(#gjHair)" stroke="#7fd0ff" stroke-width="1.2" stroke-linejoin="round"/>
-    <rect x="96" y="134" width="108" height="32" rx="8" fill="#04050f"/>
-    <rect x="96" y="134" width="108" height="4" rx="2" fill="#3a46a0" opacity=".8"/>
-    <path d="M116 172Q128 178 140 172M160 172Q172 178 184 172" stroke="#8fe8ff" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path d="M136 208Q150 214 164 208" stroke="#0a0d26" stroke-width="3" fill="none" stroke-linecap="round"/>
-  </symbol>
-  <symbol id="kzCompass" viewBox="0 0 200 200"><g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <polygon points="100,8 180,54 180,146 100,192 20,146 20,54" stroke="#9fe6ff" stroke-width="3"/>
-    <polygon points="100,30 160,65 160,135 100,170 40,135 40,65" stroke="#9b6bff" stroke-width="2" opacity=".85"/>
-    <polygon points="100,52 140,76 140,124 100,148 60,124 60,76" stroke="#ff5c7a" stroke-width="1.6" opacity=".8"/>
-    <path d="M62 100C62 78 88 78 100 100C112 122 138 122 138 100C138 78 112 78 100 100C88 122 62 122 62 100Z" stroke="#e9f8ff" stroke-width="5"/>
-    <path d="M100 0V14M100 186V200M0 100H14M186 100H200" stroke="#9fe6ff" stroke-width="3"/>
-  </g></symbol>
-</defs></svg>
-
-<!-- ===== Animated system background: INFINITE VOID (Blue / Red / Hollow Purple) ===== -->
+<!-- ===== Animated background: calm water at night (seigaiha waves, light shafts, rising bubbles) ===== -->
 <div id="dsBg" aria-hidden="true">
-  <div class="gjSky"></div>
-  <div class="gjStars"><i style="--x:32.4%;--y:15.1%;--s:2px;--d:0.4s"></i><i style="--x:53.6%;--y:36.6%;--s:2px;--d:5.5s"></i><i style="--x:21.5%;--y:8.6%;--s:4px;--d:0.4s"></i><i style="--x:9.1%;--y:42.5%;--s:2px;--d:5.7s"></i><i style="--x:63.1%;--y:58.3%;--s:2px;--d:3.5s"></i><i style="--x:39.7%;--y:97.6%;--s:2px;--d:3.3s"></i><i style="--x:13.3%;--y:41.9%;--s:2px;--d:3.4s"></i><i style="--x:56.0%;--y:68.2%;--s:2px;--d:3.5s"></i><i style="--x:63.9%;--y:37.2%;--s:2px;--d:3.4s"></i><i style="--x:61.9%;--y:49.6%;--s:4px;--d:4.7s"></i><i style="--x:46.6%;--y:92.3%;--s:3px;--d:1.8s"></i><i style="--x:79.4%;--y:69.9%;--s:2px;--d:0.5s"></i><i style="--x:30.0%;--y:49.5%;--s:3px;--d:4.4s"></i><i style="--x:28.8%;--y:98.0%;--s:2px;--d:3.1s"></i><i style="--x:16.5%;--y:34.2%;--s:4px;--d:2.5s"></i><i style="--x:96.2%;--y:7.8%;--s:3px;--d:2.0s"></i><i style="--x:35.0%;--y:49.7%;--s:4px;--d:0.4s"></i><i style="--x:9.4%;--y:27.0%;--s:2px;--d:0.4s"></i><i style="--x:70.1%;--y:64.7%;--s:4px;--d:1.7s"></i><i style="--x:38.6%;--y:66.9%;--s:2px;--d:5.6s"></i><i style="--x:35.5%;--y:61.1%;--s:4px;--d:0.4s"></i><i style="--x:76.8%;--y:12.9%;--s:2px;--d:2.4s"></i><i style="--x:91.7%;--y:49.7%;--s:2px;--d:2.7s"></i><i style="--x:54.9%;--y:88.3%;--s:4px;--d:5.2s"></i><i style="--x:27.8%;--y:41.5%;--s:3px;--d:4.1s"></i><i style="--x:38.0%;--y:23.1%;--s:2px;--d:1.1s"></i><i style="--x:23.2%;--y:23.3%;--s:4px;--d:5.0s"></i><i style="--x:18.2%;--y:28.2%;--s:2px;--d:2.5s"></i><i style="--x:36.9%;--y:56.6%;--s:2px;--d:4.1s"></i><i style="--x:51.5%;--y:61.8%;--s:2px;--d:2.7s"></i><i style="--x:87.1%;--y:95.2%;--s:4px;--d:2.4s"></i><i style="--x:39.4%;--y:48.2%;--s:4px;--d:0.4s"></i><i style="--x:6.7%;--y:20.9%;--s:2px;--d:0.7s"></i><i style="--x:60.1%;--y:10.2%;--s:2px;--d:3.2s"></i><i style="--x:94.9%;--y:61.4%;--s:2px;--d:5.2s"></i><i style="--x:61.4%;--y:14.9%;--s:3px;--d:5.7s"></i><i style="--x:60.2%;--y:47.4%;--s:2px;--d:5.1s"></i><i style="--x:99.3%;--y:46.6%;--s:4px;--d:1.9s"></i><i style="--x:14.4%;--y:75.0%;--s:3px;--d:2.9s"></i><i style="--x:69.2%;--y:51.6%;--s:2px;--d:5.7s"></i><i style="--x:52.8%;--y:14.7%;--s:2px;--d:4.5s"></i><i style="--x:29.8%;--y:64.3%;--s:2px;--d:4.2s"></i><i style="--x:26.1%;--y:36.7%;--s:2px;--d:2.1s"></i><i style="--x:22.3%;--y:54.2%;--s:3px;--d:3.8s"></i><i style="--x:61.3%;--y:78.8%;--s:2px;--d:4.8s"></i><i style="--x:81.8%;--y:74.0%;--s:2px;--d:1.2s"></i></div>
-  <i class="gjRays"></i>
-  <div class="gjOrb o1"></div><div class="gjOrb o2"></div><div class="gjOrb o3"></div>
-  <div class="gjHex"></div>
-  <div class="gjGrid"></div>
-  <div class="gjSil"><svg viewBox="0 0 300 380" aria-hidden="true"><use href="#kzGojo"/></svg></div>
+  <div class="gyDeep"></div>
+  <i class="gyShaft s1"></i><i class="gyShaft s2"></i>
+  <div class="gySeig"></div>
+  <div class="gyWaves">
+    <svg class="gyWave w1" viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0 100Q150 40 300 100T600 100T900 100T1200 100T1500 100T1800 100T2100 100T2400 100V200H0Z"/></svg>
+    <svg class="gyWave w2" viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0 100Q150 40 300 100T600 100T900 100T1200 100T1500 100T1800 100T2100 100T2400 100V200H0Z"/></svg>
+    <svg class="gyWave w3" viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0 100Q150 40 300 100T600 100T900 100T1200 100T1500 100T1800 100T2100 100T2400 100V200H0Z"/></svg>
+  </div>
   <div class="dsItems" id="dsItems"></div>
 </div>
 <div id="dsFront" aria-hidden="true"></div>
@@ -207,14 +179,14 @@
       <div class="dhGrid"></div>
       <i class="dhScan"></i>
       <div class="dhCopy">
-        <span class="dhSys"><i></i> INFINITE VOID &bull; KOHAT ZALMI</span>
+        <span class="dhSys"><i></i> Water Breathing &bull; Kohat Zalmi</span>
         <h2 class="dhTitle">CRICKET <b>PERFORMANCE</b> DASHBOARD</h2>
         <p>Players, matches, rankings and performance in one place.</p>
         <div class="dhBtns">
           <button class="primary" data-go="players">Explore Players</button>
           <button class="heroBtn" data-go="leaders">Meet Our Leaders</button>
         </div>
-        <div class="dhTicks" aria-hidden="true"><span>CLAN</span><b>KZ</b><i></i><span>DOMAIN</span><b>ONE TEAM</b></div>
+        <div class="dhTicks" aria-hidden="true"><span>Form</span><b>Water</b><i></i><span>Unit</span><b>One team</b></div>
       </div>
     </div>
 
@@ -325,7 +297,7 @@
     <div class="ldHead">
       <span class="ldKicker">KOHAT ZALMI • LEADERSHIP</span>
       <h2 class="ldTitle">THE <b>LEADERS</b></h2>
-      <p class="ldSub">Rise. Lead. Dominate. One team, one ego, one family.</p>
+      <p class="ldSub">Calm minds, steady hands. One team, one family.</p>
       <div class="ldRule"><i></i><em class="ldDiamond"></em><i></i></div>
     </div>
 
@@ -336,28 +308,29 @@
   </section>
 
   <section class="page" id="team">
-    <div class="tmHero">
-      <i class="tmCrack" aria-hidden="true"></i>
-      <div class="tmWord" aria-hidden="true">TEAM</div>
-      <div class="tmCopy">
-        <span class="tmKicker">KOHAT ZALMI • THE SORCERERS</span>
-        <h2 class="tmTitle"><span class="t1">MEET</span> <span class="t2">OUR</span> <span class="t3">TEAM</span></h2>
-        <p class="tmSub">Built by discipline. Driven by passion. United as one Kohat Zalmi family.</p>
-        <div class="tmChips">
-          <span class="chip pk"><b id="tmCount">15</b> Sorcerers</span>
-          <span class="chip yl"><b>1</b> Captain</span>
-          <span class="chip pk"><b>1</b> Vice Captain</span>
-          <span class="chip yl"><b>1</b> Nakama</span>
+    <div class="gyTeam" id="gyTeam">
+      <i class="gyTeamBand" aria-hidden="true"></i>
+      <div class="gyTeamIn">
+        <div class="gyTeamCopy">
+          <h2 class="gyTeamTitle"><span>Meet our team</span></h2>
+          <svg class="gyTeamWave" viewBox="0 0 320 24" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 14C30 2 52 2 80 12S132 24 160 12S212 0 240 12S292 22 318 10"/></svg>
+          <p class="gyTeamLead">Every player in the Kohat Zalmi squad, with role, batting and bowling style, and live match stats on the back of each card.</p>
+          <dl class="gyFacts">
+            <div><dt>Players</dt><dd id="tmCount">15</dd></div>
+            <div><dt>Captain</dt><dd id="tmCaptain">&mdash;</dd></div>
+            <div><dt>Vice captain</dt><dd id="tmVice">&mdash;</dd></div>
+          </dl>
+          <div class="gyTeamBtns">
+            <button class="primary" type="button" data-scroll="teamGrid">View the squad</button>
+            <button class="heroBtn" type="button" data-go="leaders">Meet the leaders</button>
+          </div>
         </div>
-      </div>
-      <div class="tmReel" aria-hidden="true">
-        <div class="tmRow r1"><div class="tmTrack" id="tmTrack1"></div></div>
-        <div class="tmRow r2"><div class="tmTrack" id="tmTrack2"></div></div>
+        <div class="gySquad" id="gySquad" role="list" aria-label="Squad. Select a player to jump to their card."></div>
       </div>
     </div>
 
     <div class="teamSectionHead">
-      <div><span class="teamKicker">THE PLAYERS</span><h3>Meet Kohat Zalmi</h3><p>Every player. Every role. One badge.</p></div>
+      <div><span class="teamKicker">The players</span><h3>Meet Kohat Zalmi</h3><p>Every player. Every role. One badge.</p></div>
       <div class="teamCount" id="teamCount">14 Players</div>
     </div>
     <div class="hcHint" aria-hidden="true"><span>Click &amp; drag to toss</span><i></i><span>Tap a card to flip</span></div>

@@ -292,7 +292,7 @@ async function deleteMatch(id) {
 /* ---- ranking cards ---- */
 let rankSort = "all";
 const RK_SORTS = {
-  all:  { label: "POWER",      val: p => n(p.runs) + 20 * n(p.wickets), show: v => Math.round(v) + " CE", dir: -1 },
+  all:  { label: "POWER",      val: p => n(p.runs) + 20 * n(p.wickets), show: v => Math.round(v) + " BP", dir: -1 },
   runs: { label: "RUNS",        val: p => n(p.runs),                      show: v => String(v), dir: -1 },
   wkts: { label: "WICKETS",     val: p => n(p.wickets),                   show: v => String(v), dir: -1 },
   avg:  { label: "AVERAGE",     val: p => avg(p),                         show: v => fmt(v), dir: -1 },

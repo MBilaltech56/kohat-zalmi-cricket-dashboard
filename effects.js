@@ -1,6 +1,6 @@
 /* ==========================================================================
-   KOHAT ZALMI — Demon Slayer theme effects (Nezuko x Zenitsu)
-   Visual only. Builds falling sakura petals, hearts and thunder sparks.
+   KOHAT ZALMI — Demon Slayer theme effects (Giyu Tomioka, Water Breathing)
+   Visual only. Builds slow rising water bubbles for the background.
    Uses only CSS transform/opacity animations so it stays smooth.
    Does not touch any site data or logic.
    ========================================================================== */
@@ -11,38 +11,29 @@
   var small = window.matchMedia && window.matchMedia("(max-width: 700px)").matches;
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
-  function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
 
-  /* type: petal (falls, pink)  heart (falls, pink/yellow)  spark (rises, yellow) */
   function build(host, count, opts) {
     if (!host || reduce) return;
     opts = opts || {};
-    var speed = opts.speed || 1;
     var frag = document.createDocumentFragment();
     for (var i = 0; i < count; i++) {
-      var r = Math.random();
-      var type = r < 0.55 ? "petal" : r < 0.78 ? "heart" : "spark";
       var el = document.createElement("i");
-      var dur = rnd(11, 20) / speed;
-      var size = type === "spark" ? rnd(3, 7) : rnd(opts.minSize || 12, opts.maxSize || 26);
-      el.className = "dsP " + type + " " + (type === "spark" ? "" : pick(["a", "b", "a"]));
-      if (type === "heart" && Math.random() < 0.45) el.className += " y";
-      el.style.setProperty("--x", rnd(-2, 100).toFixed(1) + "%");
-      el.style.setProperty("--s", size.toFixed(1) + "px");
+      var dur = rnd(16, 30);
+      el.className = "gyB";
+      el.style.setProperty("--x", rnd(1, 99).toFixed(1) + "%");
+      el.style.setProperty("--s", rnd(opts.min || 5, opts.max || 16).toFixed(1) + "px");
       el.style.setProperty("--d", dur.toFixed(1) + "s");
-      el.style.setProperty("--dl", (opts.positiveDelay ? rnd(0, 3) : -rnd(0, dur)).toFixed(1) + "s");
-      el.style.setProperty("--dr", rnd(-140, 140).toFixed(0) + "px");
-      el.style.setProperty("--rot", rnd(-540, 540).toFixed(0) + "deg");
-      el.style.setProperty("--o", (opts.opacity || rnd(0.55, 0.95)).toFixed(2));
+      el.style.setProperty("--dl", (-rnd(0, dur)).toFixed(1) + "s");
+      el.style.setProperty("--dr", rnd(-60, 60).toFixed(0) + "px");
+      el.style.setProperty("--o", (opts.opacity || rnd(0.25, 0.6)).toFixed(2));
       frag.appendChild(el);
     }
     host.appendChild(frag);
   }
 
   function init() {
-    build(document.getElementById("dsItems"), small ? 12 : 22);
-    build(document.getElementById("dsFront"), small ? 3 : 6, { opacity: 0.5, minSize: 10, maxSize: 20 });
-    build(document.getElementById("spItems"), small ? 22 : 38, { speed: 1.6, positiveDelay: true, minSize: 12, maxSize: 30 });
+    build(document.getElementById("dsItems"), small ? 9 : 16);
+    build(document.getElementById("dsFront"), small ? 2 : 4, { opacity: 0.3, min: 8, max: 20 });
   }
 
   /* Pause background motion when the tab is hidden (saves battery). */
@@ -56,26 +47,52 @@
 
 
 /* ==========================================================================
-   Meet Our Team hero: two moving rows of squad photos (visual only)
+   Meet Our Team hero: squad overview (visual only).
+   Fills the facts row and a tidy roster sheet. Selecting a face scrolls to that
+   player's hanging card and gives it a gentle sway.
    ========================================================================== */
 function buildTeamReel(roster) {
-  var t1 = document.getElementById("tmTrack1"), t2 = document.getElementById("tmTrack2");
-  var cnt = document.getElementById("tmCount");
-  if (cnt) cnt.textContent = roster.length;
-  if (!t1 || !t2 || !roster.length) return;
-  function item(p, i) {
+  var esc = function (v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function (m) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]; }); };
+  var set = function (id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
+  set("tmCount", roster.length);
+  var cap = roster.filter(function (p) { return p.captain === "Captain"; })[0];
+  var vice = roster.filter(function (p) { return p.captain === "Vice Captain"; })[0];
+  set("tmCaptain", cap ? cap.name : "—");
+  set("tmVice", vice ? vice.name : "—");
+
+  var host = document.getElementById("gySquad");
+  if (!host || !roster.length) return;
+  host.innerHTML = roster.map(function (p, i) {
     var first = String(p.name || "").replace(/^M\.\s*/, "").split(" ")[0];
-    var esc = function (v) { return String(v).replace(/[&<>"']/g, function (m) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]; }); };
-    return '<span class="tmFace ' + (i % 2 ? "y" : "p") + '"><img src="' + esc(p.photo) + '" alt="" decoding="async"><em>' + esc(first) + '</em></span>';
-  }
-  function fill(el, list) {
-    var once = list.map(item).join("");
-    el.innerHTML = once + once;           /* duplicated for a seamless loop */
-  }
-  fill(t1, roster);
-  fill(t2, roster.slice().reverse());
+    var badge = p.captain === "Captain" ? '<b class="gyRank" title="Captain">C</b>' : p.captain === "Vice Captain" ? '<b class="gyRank vc" title="Vice captain">VC</b>' : "";
+    return '<button type="button" class="gyFace" role="listitem" style="--i:' + i + '" data-i="' + i + '" aria-label="Go to ' + esc(p.name) + ' card">' +
+      '<span class="gyShot"><img src="' + esc(p.photo) + '" alt="" decoding="async" draggable="false">' + badge + '</span>' +
+      '<em>' + esc(first) + '</em></button>';
+  }).join("");
 }
 window.buildTeamReel = buildTeamReel;
+
+(function () {
+  function bind() {
+    document.addEventListener("click", function (e) {
+      var face = e.target.closest ? e.target.closest(".gyFace") : null;
+      if (face) {
+        var grid = document.getElementById("teamGrid");
+        var card = grid && grid.children[+face.dataset.i];
+        if (!card) return;
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(function () { if (card._hc) { card._hc.w += 1.3; card._hc.wake(); } }, 450);
+        return;
+      }
+      var go = e.target.closest ? e.target.closest("[data-scroll]") : null;
+      if (go) {
+        var t = document.getElementById(go.getAttribute("data-scroll"));
+        if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind); else bind();
+})();
 
 /* ==========================================================================
    Leaders page: soft 3D tilt that follows the pointer (desktop only)
@@ -191,12 +208,12 @@ window.renderHeroCards = renderHeroCards;
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bindHero); else bindHero();
 
   /* ---- 4. page-change splash (1.2s) + browser back/forward ----
-     0-0.3s wave sweeps in | 0.3-0.8s compass + destination title | 0.8-1.2s wave sweeps out.
+     0-0.3s water rises | 0.3-0.8s emblem + destination title | 0.8-1.2s water clears.
      The page swap happens while the screen is covered. Real navigation only: same-page clicks never trigger it. */
   var TITLES = { dashboard: "Dashboard", players: "Players", matches: "Matches", rankings: "Rankings", analytics: "Analytics",
                  venues: "Venues", leaders: "The Leaders", team: "Meet Our Team", add: "Add Performance", addPlayer: "Add Player" };
   function installRouter() {
-    var raw = window.go, warp = document.getElementById("kzWarp"), label = document.getElementById("kwTitle");
+    var raw = window.go, warp = document.getElementById("gyWarp"), label = document.getElementById("gyTitle");
     if (typeof raw !== "function" || window.go.kz) return;
     var fx = !!(warp && label) && !calm, busy = false, target = null, pending = null;
 
@@ -256,7 +273,7 @@ window.renderHeroCards = renderHeroCards;
 
 
 /* ==========================================================================
-   Infinite Void background: gentle pointer + scroll parallax, and a lighter mode for weak devices
+   Water background: gentle pointer + scroll parallax, and a lighter mode for weak devices
    ========================================================================== */
 (function () {
   var bg = document.getElementById("dsBg");
@@ -316,7 +333,7 @@ window.renderHeroCards = renderHeroCards;
     var tag = p.captain ? p.captain.toUpperCase() : String(p.role || "PLAYER").toUpperCase();
     var code = "KZ-" + (p.jersey ? String(p.jersey).padStart(2, "0") : String(i + 1).padStart(2, "0"));
     var st = findStats(p.name);
-    var bounty = st ? ((+st.runs || 0) + 20 * (+st.wickets || 0)) + " CE" : "??? CE";
+    var bounty = st ? ((+st.runs || 0) + 20 * (+st.wickets || 0)) + " BP" : "??? BP";
     var stats = st ? '<div class="hcStats"><div><b>' + (+st.matches || 0) + "</b><small>MATCHES</small></div><div><b>" + (+st.runs || 0) + "</b><small>RUNS</small></div><div><b>" + (+st.wickets || 0) + "</b><small>WKTS</small></div></div>" : "";
     var rows = "";
     if (p.batting) rows += "<div><dt>BAT</dt><dd>" + esc(p.batting) + "</dd></div>";
@@ -336,10 +353,10 @@ window.renderHeroCards = renderHeroCards;
             '<div class="hcBottom"><small>' + esc(p.role) + "</small><h3>" + esc(p.name) + '</h3><div class="hcRow">' + (p.jersey ? '<span class="hcNo">#' + esc(p.jersey) + "</span>" : "<span></span>") + '<span class="hcFlipHint">&#10227; FLIP</span></div></div>' +
           "</div>" +
           '<div class="hcFace hcBack"><i class="hcHole"></i><div class="hcBackIn">' +
-            '<div class="hcWanted">SORCERER</div><div class="hcCrew">KOHAT ZALMI • ' + code + "</div>" +
-            '<div class="hcWho"><small>JUJUTSU SORCERER</small><b>' + esc(p.name) + '</b><div class="hcRole">' + esc(p.role) + "</div></div>" +
+            '<div class="hcWanted">SLAYER FILE</div><div class="hcCrew">KOHAT ZALMI • ' + code + "</div>" +
+            '<div class="hcWho"><small>WATER BREATHING</small><b>' + esc(p.name) + '</b><div class="hcRole">' + esc(p.role) + "</div></div>" +
             '<dl class="hcList">' + rows + "</dl>" + stats +
-            '<div class="hcBounty"><small>CURSED ENERGY</small><b>' + bounty + "</b></div>" +
+            '<div class="hcBounty"><small>BREATH POWER</small><b>' + bounty + "</b></div>" +
           "</div></div>" +
         "</div></div>" +
       "</div></article>";

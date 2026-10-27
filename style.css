@@ -2719,202 +2719,276 @@ body:not(.night) .opW.w3{--wc:rgba(14,100,160,.92);--wc2:rgba(8,70,120,.98)}
 body:not(.night) .heading h1{background:none;-webkit-text-fill-color:#0a2540;color:#0a2540;filter:none;animation:none;text-shadow:0 2px 0 rgba(255,255,255,.7)}
 body:not(.night) .heading p{color:#1b4466}
 
+
 /* ==========================================================================
-   DS-23. GRAND LINE CINEMA
-   A. 9-second opening splash   B. 1.2-second page-change splash
-   C. living ocean background   D. WANTED-poster card back, readable
-   E. smoothness (GPU-friendly motion, lighter paint)
-   Everything animates transform/opacity only. Nothing here touches data or logic.
+   DS-25. DEMON SLAYER x GIYU TOMIOKA  —  Water Breathing (Water Hashira)
+   Deep-water ink + water blue + haori jade, with kikko rust used sparingly.
+   Original symbols only (split-haori emblem, seigaiha waves, ripples).
+   A. tokens  B. type  C. background  D. splash  E. page transition
+   F. MEET OUR TEAM hero  G. hanging cards  H. smoothness
    ========================================================================== */
 
-@property --kiP{syntax:"<integer>";inherits:true;initial-value:0}
-@keyframes kiFadeIn{to{opacity:1}}
-@keyframes kiFadeOut{to{opacity:0}}
-@keyframes kiSpin{to{transform:rotate(360deg)}}
+/* ---------------------------------------------------------------- A. TOKENS */
+:root{
+  --bg:#EAF5FB;
+  --bg-grad:radial-gradient(1000px 600px at 88% -10%,rgba(63,167,230,.22),transparent 60%),radial-gradient(900px 560px at 0% 0%,rgba(46,156,132,.14),transparent 58%);
+  --surface:#FFFFFF;--surface-2:#F2F9FD;--surface-3:#DDEEF8;--card-a:#FFFFFF;--card-b:#EAF5FB;
+  --line:rgba(12,60,92,.14);--line-strong:rgba(12,60,92,.28);
+  --text:#082030;--text-2:#1C4560;--muted:#506F84;
+  --gold:#1D78B8;--gold-2:#3FA7E6;--gold-soft:rgba(47,143,216,.16);
+  --pink:#1F8A73;--pink-2:#3CB79C;--pink-soft:rgba(46,156,132,.16);
+  --green:#1F8A73;--green-soft:rgba(31,138,115,.14);
+  --red:#B5472F;--red-soft:rgba(181,71,47,.12);
+  --shadow-1:0 1px 2px rgba(6,40,64,.08),0 12px 28px -18px rgba(29,120,184,.5);
+  --shadow-2:0 2px 6px rgba(6,40,64,.10),0 28px 52px -28px rgba(29,120,184,.55);
+  --glass:rgba(234,245,251,.88);
+  --font-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;
+}
+body.night{
+  --bg:#04121C;
+  --bg-grad:radial-gradient(1000px 600px at 88% -10%,rgba(63,167,230,.18),transparent 62%),radial-gradient(900px 560px at 0% 0%,rgba(46,156,132,.14),transparent 58%),radial-gradient(900px 700px at 50% 125%,rgba(29,120,184,.18),transparent 60%);
+  --surface:#0A1F2E;--surface-2:#0E2A3D;--surface-3:#133650;--card-a:#0F2A3D;--card-b:#081B29;
+  --line:rgba(143,214,255,.14);--line-strong:rgba(143,214,255,.30);
+  --text:#EEF8FF;--text-2:#C5E2F2;--muted:#8FB3C7;
+  --gold:#5BB8F0;--gold-2:#A6DEFF;--gold-soft:rgba(91,184,240,.18);
+  --pink:#4FCDB0;--pink-2:#9BEBD6;--pink-soft:rgba(79,205,176,.16);
+  --green:#4FCDB0;--green-soft:rgba(79,205,176,.14);
+  --red:#E0735A;--red-soft:rgba(224,115,90,.16);
+  --shadow-1:0 1px 2px rgba(0,0,0,.55),0 12px 30px -18px rgba(63,167,230,.4);
+  --shadow-2:0 2px 8px rgba(0,0,0,.6),0 32px 60px -30px rgba(63,167,230,.35);
+  --glass:rgba(5,20,32,.86);
+}
+meta{color-scheme:dark light}
+.top{background:rgba(234,245,251,.95)}
+body.night .top{background:rgba(4,18,28,.95)}
+.crest{background:linear-gradient(135deg,#1b6b59 0 50%,#6f2a20 50% 100%);color:#eaf8ff;border:1px solid rgba(143,214,255,.6)}
+.brandText b{letter-spacing:.16em}
+body:not(.night) .heading h1{-webkit-text-fill-color:#082030;color:#082030;text-shadow:none;background:none;animation:none;filter:none}
+body:not(.night) .heading p{color:#1c4560}
+body.night .heading h1{background:none;-webkit-text-fill-color:#eef8ff;color:#eef8ff;animation:none;filter:none}
 
-/* ---------------------------------------------------------------- A. OPENING SPLASH — INFINITE VOID (9s) */
-#kzIntro{position:fixed;inset:0;z-index:10000;overflow:hidden;color:#fff;animation:kiAway 0s linear 9s forwards}
-html.kiSkip #kzIntro{display:none}
-@keyframes kiAway{to{visibility:hidden;pointer-events:none}}
-body.kiLock{overflow:hidden}
-.kiScene{position:absolute;inset:0;background:#02030a;overflow:hidden;animation:kiHide 0s linear 8.15s forwards}
-@keyframes kiHide{to{visibility:hidden}}
-.kiScene > *{pointer-events:none}
-.kiWorld{position:absolute;inset:-4%;transform-origin:50% 55%;will-change:transform;animation:kiCam 9s linear both}
-@keyframes kiCam{from{transform:scale(1)}to{transform:scale(1.08)}}
-.kiSky{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 62%,#17143f 0,#0a0b26 44%,#02030a 100%)}
-.kiGrid{position:absolute;left:-25%;right:-25%;bottom:0;height:48%;opacity:0;transform-origin:50% 100%;transform:perspective(520px) rotateX(64deg);
-  background:repeating-linear-gradient(90deg,rgba(100,170,255,.30) 0 1px,transparent 1px 6%),repeating-linear-gradient(0deg,rgba(100,170,255,.22) 0 1px,transparent 1px 10%);
-  -webkit-mask-image:linear-gradient(0deg,#000,transparent 88%);mask-image:linear-gradient(0deg,#000,transparent 88%);animation:kiFadeIn 2.4s ease .5s forwards}
-.kiStars{position:absolute;inset:0}
-.kiStars i{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);border-radius:50%;background:#cfe6ff;box-shadow:0 0 6px rgba(160,210,255,.9);opacity:0;animation:kiTw 3.6s ease-in-out var(--d) infinite}
-@keyframes kiTw{0%,100%{opacity:.08}50%{opacity:.95}}
-.kiRays{position:absolute;left:0;right:0;top:-6%;height:70%;opacity:0;will-change:transform;
-  background:repeating-linear-gradient(100deg,transparent 0 5%,rgba(110,190,255,.12) 5% 7.5%,transparent 7.5% 14%,rgba(170,110,255,.10) 14% 15.5%,transparent 15.5% 24%);
-  -webkit-mask-image:radial-gradient(ellipse 60% 100% at 50% 100%,#000,transparent 82%);mask-image:radial-gradient(ellipse 60% 100% at 50% 100%,#000,transparent 82%);
-  animation:kiFadeIn 2.4s ease 2.2s forwards,kiShaft 14s ease-in-out infinite alternate}
-@keyframes kiShaft{from{transform:translate3d(-3%,0,0) scaleX(1.05)}to{transform:translate3d(3%,0,0) scaleX(1.12)}}
-.kiHex{position:absolute;left:50%;top:54%;width:96vmin;height:96vmin;margin:-48vmin 0 0 -48vmin;opacity:0;will-change:transform;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,2 93,26 93,74 50,98 7,74 7,26' fill='none' stroke='%237fc4ff' stroke-width='.5'/%3E%3Cpolygon points='50,12 84,31 84,69 50,88 16,69 16,31' fill='none' stroke='%23a77bff' stroke-width='.35'/%3E%3C/svg%3E") center/100% 100% no-repeat;
-  animation:kiFadeIn 2s ease 3s forwards,kiSpin 90s linear infinite}
-.kiSil{position:absolute;left:50%;bottom:-3%;width:min(52vmin,480px);translate:-50% 0;opacity:0;filter:drop-shadow(0 0 2.6vmin rgba(90,170,255,.38));
-  animation:kiSilIn 2.6s ease 1.8s forwards}
-.kiSil svg{display:block;width:100%;height:auto}
-@keyframes kiSilIn{from{opacity:0;transform:translate3d(0,5%,0)}to{opacity:1;transform:none}}
-.kiOrb{position:absolute;top:56%;width:15vmin;aspect-ratio:1;margin:-7.5vmin 0 0 -7.5vmin;border-radius:50%;opacity:0;will-change:transform,opacity}
-.kiOrb.blue{left:22%;background:radial-gradient(circle,#fff 0,#b4ecff 14%,#2cb4ff 36%,rgba(20,100,255,.38) 58%,transparent 72%);animation:kiBlue 3.2s cubic-bezier(.45,0,.3,1) 1.9s both}
-.kiOrb.red{left:78%;background:radial-gradient(circle,#fff 0,#ffc4cc 14%,#ff3355 36%,rgba(190,10,40,.42) 58%,transparent 72%);animation:kiRed 3.2s cubic-bezier(.45,0,.3,1) 1.9s both}
-@keyframes kiBlue{0%{opacity:0;transform:scale(.2)}18%{opacity:1;transform:translate3d(0,-3vh,0) scale(1)}60%{opacity:1;transform:translate3d(10vw,4vh,0) scale(1)}94%{opacity:1;transform:translate3d(27vw,0,0) scale(.85)}100%{opacity:0;transform:translate3d(28vw,0,0) scale(.6)}}
-@keyframes kiRed{0%{opacity:0;transform:scale(.2)}18%{opacity:1;transform:translate3d(0,3vh,0) scale(1)}60%{opacity:1;transform:translate3d(-10vw,-4vh,0) scale(1)}94%{opacity:1;transform:translate3d(-27vw,0,0) scale(.85)}100%{opacity:0;transform:translate3d(-28vw,0,0) scale(.6)}}
-.kiPurple{position:absolute;left:50%;top:56%;width:36vmin;aspect-ratio:1;margin:-18vmin 0 0 -18vmin;border-radius:50%;opacity:0;will-change:transform,opacity;
-  background:radial-gradient(circle,#fff 0,#f0d8ff 9%,#b266ff 26%,#6a1fd6 46%,rgba(40,8,110,.55) 62%,transparent 72%);
-  animation:kiPurple 2.2s cubic-bezier(.2,.8,.2,1) 5s forwards,kiPulse 2.4s ease-in-out 7.2s infinite}
-@keyframes kiPurple{0%{opacity:0;transform:scale(.1)}40%{opacity:1;transform:scale(1.25)}100%{opacity:.92;transform:scale(1)}}
-@keyframes kiPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.kiShock{position:absolute;left:50%;top:56%;width:30vmin;aspect-ratio:1;margin:-15vmin 0 0 -15vmin;border-radius:50%;border:3px solid rgba(225,195,255,.9);opacity:0;will-change:transform,opacity;animation:kiShock 1.4s ease-out 5s forwards}
-@keyframes kiShock{0%{opacity:.95;transform:scale(.2)}100%{opacity:0;transform:scale(4.2)}}
-.kiMotes{position:absolute;inset:0;overflow:hidden}
-.kiMotes i{position:absolute;left:var(--x);bottom:-2vmin;width:var(--s);height:var(--s);border-radius:50%;background:rgba(160,220,255,.85);box-shadow:0 0 6px rgba(120,200,255,.8);opacity:0;animation:kiMote var(--dur) linear var(--dl) infinite}
-.kiMotes i.g{background:#c58cff;box-shadow:0 0 6px rgba(190,120,255,.9)}
-@keyframes kiMote{0%{opacity:0;transform:translate3d(0,0,0)}12%,85%{opacity:var(--o)}100%{opacity:0;transform:translate3d(var(--dx),-88vh,0)}}
-.kiShade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 50%,rgba(0,2,10,.72))}
-.kiShade::after{content:"";position:absolute;inset:0;opacity:0;animation:kiFadeIn 1.2s ease 4.8s forwards;background:radial-gradient(ellipse 64% 40% at 50% 28%,rgba(3,4,16,.66),transparent 72%)}
-.kiTitleWrap{position:absolute;left:0;right:0;top:9%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 4vw}
-.kiCrest{width:clamp(70px,15vmin,120px);opacity:0;transform:scale(.4) rotate(-20deg);filter:drop-shadow(0 0 2.2vmin rgba(130,170,255,.6));animation:kiCrestIn 1.2s cubic-bezier(.2,1.3,.3,1) 5s forwards}
-.kiCrest svg{display:block;width:100%;height:auto}
-@keyframes kiCrestIn{to{opacity:1;transform:none}}
-.kiTitle{display:flex;flex-wrap:wrap;justify-content:center;gap:0 .3em;margin-top:2vmin;font:400 clamp(52px,13vmin + 1.4vw,132px)/1 "Bebas Neue","Rajdhani",sans-serif;letter-spacing:.07em}
-.kiWd{display:inline-flex}
-.kiTitle b{display:inline-block;font-weight:400;opacity:0;transform:translate3d(0,.35em,0) scale(1.14);
-  background:linear-gradient(180deg,#fff 0%,#d4ecff 52%,#92b4ff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 .22em rgba(150,90,255,.75));animation:kiLetter .9s cubic-bezier(.2,.8,.2,1) calc(5.35s + var(--i) * .07s) forwards}
-@keyframes kiLetter{to{opacity:1;transform:none}}
-.kiRule{display:block;width:min(60vw,440px);height:2px;margin-top:1.8vmin;transform:scaleX(0);background:linear-gradient(90deg,transparent,#3cb8ff,#b07dff,#ff4d6d,transparent);box-shadow:0 0 14px rgba(150,110,255,.8);animation:kiRule 1s cubic-bezier(.2,.8,.2,1) 6s forwards}
-@keyframes kiRule{to{transform:none}}
-.kiTag{margin-top:1.6vmin;padding-left:.5em;font:700 clamp(13px,2.4vmin + .6vw,24px) "Rajdhani",sans-serif;letter-spacing:.5em;text-transform:uppercase;color:#d6dcff;text-shadow:0 0 14px rgba(120,120,255,.8);opacity:0;transform:translate3d(0,1.2vmin,0);animation:kiTagIn 1s ease 6.3s forwards}
-@keyframes kiTagIn{to{opacity:1;transform:none}}
-.kiFlare{position:absolute;left:50%;top:48%;width:90vw;height:3px;margin-left:-45vw;opacity:0;transform:scaleX(.1);background:radial-gradient(ellipse at center,rgba(220,200,255,.95),rgba(130,100,255,.35) 40%,transparent 70%);animation:kiFlare 1.6s ease 5.2s forwards}
-@keyframes kiFlare{35%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1.2)}}
-.kiProg{position:absolute;left:50%;bottom:max(30px,calc(env(safe-area-inset-bottom) + 22px));width:min(440px,72vw);translate:-50% 0;opacity:0;animation:kiFadeIn .8s ease .6s forwards}
-.kiProgTop{display:flex;justify-content:space-between;margin-bottom:9px;font:700 12px/1 "Rajdhani",sans-serif;letter-spacing:.32em;color:#c4d2ff;text-shadow:0 1px 3px rgba(0,0,0,.7)}
-.kiPct{display:none;min-width:3.4em;text-align:right;letter-spacing:.12em;animation:kiPct 6.5s cubic-bezier(.35,.05,.25,1) .8s both}
-#kzIntro.kiPctOk .kiPct{display:block}
-.kiPct::after{counter-reset:kiN var(--kiP);content:counter(kiN) "%"}
-@keyframes kiPct{to{--kiP:100}}
-.kiTrack{height:4px;border-radius:4px;overflow:hidden;background:rgba(140,170,255,.18);box-shadow:0 0 0 1px rgba(140,170,255,.16)}
-.kiFill{display:block;height:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#2cb4ff,#9b6bff 55%,#ff4d6d);box-shadow:0 0 12px rgba(150,110,255,.85);animation:kiBar 6.5s cubic-bezier(.35,.05,.25,1) .8s both}
-@keyframes kiBar{to{transform:scaleX(1)}}
-.kiSkipBtn{position:absolute;right:max(14px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));min-height:40px;padding:9px 15px;border-radius:999px;border:1px solid rgba(160,180,255,.32);background:rgba(6,8,28,.55);color:#e9eeff;font:700 12px "Rajdhani",sans-serif;letter-spacing:.16em;text-transform:uppercase;opacity:0;cursor:pointer;pointer-events:auto;animation:kiFadeIn .6s ease 1.6s forwards}
-.kiSkipBtn:hover{background:rgba(40,40,110,.75)}
-.kiSkipBtn:focus-visible{outline:2px solid #b07dff;outline-offset:2px}
-.kiFade{position:absolute;inset:0;background:#02030a;animation:kiFadeOut 1.8s ease .1s forwards}
-/* 7.3s -> 9.0s : Hollow Purple swells over the whole screen, then dissolves to reveal the website */
-.kiWave{position:absolute;left:50%;top:56%;width:175vmax;height:175vmax;margin:-87.5vmax 0 0 -87.5vmax;border-radius:50%;will-change:transform,opacity;opacity:0;transform:scale(.01);
-  background:radial-gradient(circle,#fff 0,#f2deff 3%,#b87cff 10%,#7a2ee6 24%,#3a1590 52%,#12073a 80%,#0a0524 100%);animation:kiWaveRun 1.7s linear 7.3s forwards}
-@keyframes kiWaveRun{
-  0%{opacity:1;transform:scale(.01);animation-timing-function:cubic-bezier(.5,0,.25,1)}
-  48%{opacity:1;transform:scale(1);animation-timing-function:cubic-bezier(.4,0,.6,1)}
-  100%{opacity:0;transform:scale(1.04)}}
-#kzIntro.kiLeave{animation:kiLeave .45s ease forwards !important}
-@keyframes kiLeave{to{opacity:0;visibility:hidden}}
-#kzIntro.kiCalm{animation:kiLeave .6s ease 2s forwards}
-.kiCalm *{animation:none !important}
-.kiCalm .kiFade,.kiCalm .kiWave,.kiCalm .kiMotes,.kiCalm .kiOrb,.kiCalm .kiShock{display:none}
-.kiCalm .kiRays,.kiCalm .kiGrid,.kiCalm .kiHex,.kiCalm .kiSil,.kiCalm .kiPurple,.kiCalm .kiProg,.kiCalm .kiTag,.kiCalm .kiShade::after,.kiCalm .kiTitle b,.kiCalm .kiCrest,.kiCalm .kiSkipBtn{opacity:1}
-.kiCalm .kiSil,.kiCalm .kiCrest,.kiCalm .kiTitle b,.kiCalm .kiTag,.kiCalm .kiRule,.kiCalm .kiFill,.kiCalm .kiPurple{transform:none}
-@media (max-height:520px){.kiTitleWrap{top:5%}.kiCrest{width:clamp(48px,13vmin,84px)}}
+/* ---------------------------------------------------------------- B. TYPE */
+.heading h1,.dhTitle,.ldTitle,.teamSectionHead h3,.panel > h3,.form h2,.modalCard h2{
+  font-family:var(--font-display);font-weight:800;letter-spacing:.01em;text-transform:none}
+.dhTitle b,.ldTitle b{font-family:inherit;background:none;-webkit-text-fill-color:currentColor;color:var(--gold-2);animation:none;filter:none}
+.panel > h3::before{content:"";display:inline-block;width:12px;height:12px;margin-right:10px;vertical-align:-1px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff,#8fd6ff 40%,#1d78b8 82%);box-shadow:0 0 8px rgba(63,167,230,.7)}
+.ldDiamond{width:18px;height:18px;border-radius:50%;filter:none;background:radial-gradient(circle at 35% 30%,#fff,#8fd6ff 40%,#1d78b8 82%);box-shadow:0 0 12px rgba(63,167,230,.8)}
+.teamKicker{color:var(--pink);letter-spacing:.12em}
 
-/* ---------------------------------------------------------------- B. PAGE-CHANGE SPLASH — LIMITLESS (1.2s) */
-#kzWarp{--edge:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 400' preserveAspectRatio='none'%3E%3Cpath d='M100 0H50C18 10 18 30 50 40C82 50 82 70 50 80C18 90 18 110 50 120C82 130 82 150 50 160C18 170 18 190 50 200C82 210 82 230 50 240C18 250 18 270 50 280C82 290 82 310 50 320C18 330 18 350 50 360C82 370 82 390 50 400H100Z'/%3E%3C/svg%3E");position:fixed;inset:0;z-index:9500;overflow:hidden;visibility:hidden;pointer-events:none}
-#kzWarp.on{visibility:visible;pointer-events:auto}
-.kwP{position:absolute;inset:0;background:var(--c);will-change:transform;transform:translate3d(calc(100% + 20vmin),0,0)}
-.kwP::before,.kwP::after{content:"";position:absolute;top:0;bottom:0;width:20vmin;background:var(--c);-webkit-mask:var(--edge) 0 0/100% 100% no-repeat;mask:var(--edge) 0 0/100% 100% no-repeat}
-.kwP::before{right:100%}.kwP::after{left:100%;transform:scaleX(-1)}
-#kzWarp.on .kwP{animation:kwIn .26s cubic-bezier(.5,.05,.2,1) calc(var(--k) * 18ms) both,kwOut .34s cubic-bezier(.7,0,.9,.5) calc(.8s + (3 - var(--k)) * 20ms) forwards}
-@keyframes kwIn{to{transform:translate3d(0,0,0)}}
-@keyframes kwOut{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-100% - 20vmin),0,0)}}
-.kwSwirl{position:absolute;left:50%;top:50%;width:120vmax;height:120vmax;margin:-60vmax 0 0 -60vmax;opacity:0;
-  background:repeating-conic-gradient(rgba(150,190,255,.14) 0 6deg,transparent 6deg 18deg);
-  -webkit-mask-image:radial-gradient(circle,transparent 7%,#000 9%,transparent 44%);mask-image:radial-gradient(circle,transparent 7%,#000 9%,transparent 44%)}
-#kzWarp.on .kwSwirl{animation:kwSwirl .9s ease-out .28s both}
-@keyframes kwSwirl{from{opacity:0;transform:rotate(-140deg) scale(.7)}30%{opacity:1}to{opacity:0;transform:rotate(50deg) scale(1.05)}}
-.kwStreak{position:absolute;left:0;top:var(--y);width:var(--w);height:2px;opacity:0;transform:translate3d(110vw,0,0);background:linear-gradient(90deg,transparent,rgba(190,170,255,.9),transparent)}
-#kzWarp.on .kwStreak{animation:kwStreak .32s linear var(--dl) both,kwStreak .32s linear calc(.86s + var(--dl)) both}
-@keyframes kwStreak{0%{opacity:0;transform:translate3d(110vw,0,0)}25%{opacity:1}100%{opacity:0;transform:translate3d(-60vw,0,0)}}
-.kwStage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.4vmin;text-align:center}
-.kwCompass{position:absolute;left:50%;top:50%;width:min(46vmin,360px);translate:-50% -50%;opacity:0;filter:drop-shadow(0 0 14px rgba(140,110,255,.65))}
-#kzWarp.on .kwCompass{animation:kwCompass .8s cubic-bezier(.2,.8,.2,1) .26s both}
-@keyframes kwCompass{0%{opacity:0;transform:rotate(-120deg) scale(.55)}30%,66%{opacity:.6}100%{opacity:0;transform:rotate(30deg) scale(1.1)}}
-.kwTitle{position:relative;padding:0 5vw;opacity:0;font:400 clamp(46px,11vmin + 2vw,112px)/1.02 "Bebas Neue","Rajdhani",sans-serif;letter-spacing:.08em;color:#fff;text-shadow:0 0 .4em rgba(120,110,255,.85),0 0 .9em rgba(60,180,255,.5)}
-#kzWarp.on .kwTitle{animation:kwTitle .64s cubic-bezier(.2,.8,.2,1) .3s both}
-@keyframes kwTitle{0%{opacity:0;transform:translate3d(0,.42em,0) scale(1.16)}28%,76%{opacity:1;transform:none}100%{opacity:0;transform:translate3d(0,-.18em,0) scale(.98)}}
-.kwLine{position:relative;display:block;width:min(38vw,300px);height:3px;transform:scaleX(0);opacity:0;background:linear-gradient(90deg,transparent,#3cb8ff,#b07dff,#ff4d6d,transparent);box-shadow:0 0 14px rgba(150,110,255,.8)}
-#kzWarp.on .kwLine{animation:kwLine .6s ease .38s both}
-@keyframes kwLine{0%{opacity:1;transform:scaleX(0)}35%,80%{opacity:1;transform:none}100%{opacity:0;transform:none}}
-@media (prefers-reduced-motion:reduce){#kzWarp{display:none !important}}
-
-/* ---------------------------------------------------------------- C. LIVING BACKGROUND — INFINITE VOID */
-#dsBg{--px:0;--py:0;--sy:0}
-.gjSky{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 18%,#15123b 0,#090b25 50%,#03040c 100%)}
-.gjSky::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .9s ease;background:linear-gradient(180deg,#f4f6ff 0,#e2e8ff 60%,#d2dbff 100%)}
-body:not(.night) .gjSky::after{opacity:1}
-.gjStars{position:absolute;inset:0;transition:opacity .9s ease}
-body:not(.night) .gjStars{opacity:0}
-.gjStars i{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);border-radius:50%;background:#cfe6ff;box-shadow:0 0 6px rgba(160,210,255,.85);opacity:.1;animation:gjTw 5s ease-in-out var(--d) infinite}
-@keyframes gjTw{0%,100%{opacity:.08}50%{opacity:.85}}
-.gjRays{position:absolute;left:-10%;right:-10%;top:-8%;height:72%;opacity:.8;will-change:transform,opacity;
-  background:repeating-linear-gradient(104deg,transparent 0 5%,rgba(110,185,255,.085) 5% 8%,transparent 8% 15%,rgba(170,110,255,.07) 15% 16.5%,transparent 16.5% 26%);
-  -webkit-mask-image:linear-gradient(200deg,#000 0,rgba(0,0,0,.5) 42%,transparent 80%);mask-image:linear-gradient(200deg,#000 0,rgba(0,0,0,.5) 42%,transparent 80%);animation:opShaft 24s ease-in-out infinite alternate}
-body:not(.night) .gjRays{background:repeating-linear-gradient(104deg,transparent 0 5%,rgba(255,255,255,.55) 5% 8%,transparent 8% 15%,rgba(140,160,255,.16) 15% 16.5%,transparent 16.5% 26%)}
-@keyframes opShaft{from{transform:translate3d(-3%,0,0);opacity:.5}to{transform:translate3d(3%,0,0);opacity:1}}
-.gjOrb{position:absolute;border-radius:50%;will-change:transform;aspect-ratio:1}
-.gjOrb.o1{left:-14vmin;top:4%;width:74vmin;background:radial-gradient(circle,rgba(42,160,255,.34),rgba(30,90,255,.12) 46%,transparent 70%);animation:gjFloatA 26s ease-in-out infinite alternate}
-.gjOrb.o2{right:-16vmin;bottom:0;width:78vmin;background:radial-gradient(circle,rgba(255,50,92,.26),rgba(190,20,60,.10) 46%,transparent 70%);animation:gjFloatB 32s ease-in-out infinite alternate}
-.gjOrb.o3{left:30%;top:28%;width:62vmin;background:radial-gradient(circle,rgba(160,90,255,.24),rgba(100,40,200,.08) 46%,transparent 70%);animation:gjPulse 10s ease-in-out infinite}
-@keyframes gjFloatA{from{transform:translate3d(0,0,0)}to{transform:translate3d(9vmin,7vmin,0)}}
-@keyframes gjFloatB{from{transform:translate3d(0,0,0)}to{transform:translate3d(-8vmin,-6vmin,0)}}
-@keyframes gjPulse{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.12);opacity:1}}
-body:not(.night) .gjOrb{opacity:.55}
-.gjHex{position:absolute;left:50%;top:50%;width:130vmin;height:130vmin;margin:-65vmin 0 0 -65vmin;opacity:.5;will-change:transform;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,2 93,26 93,74 50,98 7,74 7,26' fill='none' stroke='%237fc4ff' stroke-width='.3'/%3E%3Cpolygon points='50,12 84,31 84,69 50,88 16,69 16,31' fill='none' stroke='%23a77bff' stroke-width='.25'/%3E%3C/svg%3E") center/100% 100% no-repeat;animation:kiSpin 160s linear infinite}
-.gjGrid{position:absolute;left:-25%;right:-25%;bottom:0;height:42%;opacity:.5;transform-origin:50% 100%;transform:perspective(520px) rotateX(64deg);
-  background:repeating-linear-gradient(90deg,rgba(100,170,255,.22) 0 1px,transparent 1px 6%),repeating-linear-gradient(0deg,rgba(100,170,255,.16) 0 1px,transparent 1px 10%);
-  -webkit-mask-image:linear-gradient(0deg,#000,transparent 88%);mask-image:linear-gradient(0deg,#000,transparent 88%)}
-body:not(.night) .gjGrid{opacity:.35}
-.gjSil{position:absolute;right:3%;bottom:-6%;width:min(52vmin,540px);opacity:.10;pointer-events:none}
-.gjSil svg{display:block;width:100%;height:auto}
-body:not(.night) .gjSil{opacity:.07;filter:invert(1) hue-rotate(180deg)}
-/* gentle parallax: pointer + scroll nudge layers a few pixels via the separate `translate` property */
-.gjSil{--pf:14}.gjOrb.o1{--pf:8}.gjOrb.o2{--pf:12}.gjOrb.o3{--pf:6}
-.gjSil,.gjOrb{translate:calc(var(--px) * var(--pf) * 1px) calc(var(--py) * var(--pf) * .5px - var(--sy) * var(--pf) * 1px);transition:translate 1s cubic-bezier(.2,.7,.2,1)}
-/* a soft veil keeps page text crisp */
-#dsBg::before{content:"";position:absolute;inset:0;z-index:9;pointer-events:none;background:linear-gradient(180deg,rgba(3,4,16,.22),rgba(3,4,16,.08) 40%,rgba(3,4,16,.22))}
-body:not(.night) #dsBg::before{background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 40%,rgba(255,255,255,.12))}
-body.dsPaused #dsBg *,body.splashOn #dsBg *{animation-play-state:paused !important}
+/* ---------------------------------------------------------------- C. BACKGROUND: calm water */
+#dsBg{--px:0;--py:0;--sy:0;position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.gyDeep{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,#0b3350 0,#07213a 42%,#031019 100%)}
+body:not(.night) .gyDeep{background:linear-gradient(180deg,#f3fbff 0,#dcf0fb 55%,#c4e4f6 100%)}
+.gyShaft{position:absolute;top:-10%;height:80%;width:26vmin;opacity:.55;will-change:transform;
+  background:linear-gradient(180deg,rgba(143,214,255,.20),transparent 80%);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 50%,transparent);mask-image:linear-gradient(90deg,transparent,#000 50%,transparent)}
+.gyShaft.s1{left:14%;transform:rotate(14deg);animation:gyShaft 16s ease-in-out infinite alternate}
+.gyShaft.s2{left:58%;width:34vmin;transform:rotate(-12deg);animation:gyShaft 22s ease-in-out -6s infinite alternate}
+@keyframes gyShaft{from{opacity:.25}to{opacity:.7}}
+body:not(.night) .gyShaft{opacity:.5;background:linear-gradient(180deg,rgba(255,255,255,.8),transparent 80%)}
+.gySeig{position:absolute;inset:0;opacity:.07;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='24' viewBox='0 0 48 24'%3E%3Cg fill='none' stroke='%238fd6ff' stroke-width='1'%3E%3Ccircle cx='24' cy='24' r='22'/%3E%3Ccircle cx='24' cy='24' r='16'/%3E%3Ccircle cx='24' cy='24' r='10'/%3E%3Ccircle cx='0' cy='12' r='22'/%3E%3Ccircle cx='0' cy='12' r='16'/%3E%3Ccircle cx='0' cy='12' r='10'/%3E%3Ccircle cx='48' cy='12' r='22'/%3E%3Ccircle cx='48' cy='12' r='16'/%3E%3Ccircle cx='48' cy='12' r='10'/%3E%3C/g%3E%3C/svg%3E") 0 0/48px 24px;
+  -webkit-mask-image:linear-gradient(180deg,#000,transparent 70%);mask-image:linear-gradient(180deg,#000,transparent 70%)}
+body:not(.night) .gySeig{opacity:.10;filter:hue-rotate(-8deg) saturate(.8) brightness(.45)}
+.gyWaves{position:absolute;left:0;right:0;bottom:0;height:34vh;min-height:180px}
+.gyWave{position:absolute;left:0;bottom:0;width:200%;height:100%;will-change:transform}
+.gyWave path{fill:rgba(29,120,184,.15)}
+.gyWave.w1{animation:gyDrift 38s linear infinite}
+.gyWave.w2{height:78%;animation:gyDrift 27s linear -9s infinite reverse}
+.gyWave.w2 path{fill:rgba(63,167,230,.10)}
+.gyWave.w3{height:56%;animation:gyDrift 19s linear -4s infinite}
+.gyWave.w3 path{fill:rgba(46,156,132,.09)}
+body:not(.night) .gyWave path{fill:rgba(29,120,184,.18)}
+@keyframes gyDrift{to{transform:translate3d(-50%,0,0)}}
+.gyB{position:absolute;left:var(--x);bottom:-30px;width:var(--s);height:var(--s);border-radius:50%;opacity:0;will-change:transform,opacity;
+  background:radial-gradient(circle at 32% 30%,rgba(255,255,255,.95),rgba(143,214,255,.35) 45%,rgba(63,167,230,.05) 72%);
+  box-shadow:inset 0 0 0 1px rgba(190,230,255,.45);animation:gyRise var(--d) linear var(--dl) infinite}
+@keyframes gyRise{0%{opacity:0;transform:translate3d(0,0,0)}10%{opacity:var(--o)}85%{opacity:var(--o)}100%{opacity:0;transform:translate3d(var(--dr),-112vh,0)}}
+.dsItems{position:absolute;inset:0;overflow:hidden}
+#dsFront{position:fixed;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+body:not(.night) .gyB{box-shadow:inset 0 0 0 1px rgba(29,120,184,.35)}
+body.dsPaused #dsBg *,body.splashOn #dsBg *,body.dsPaused #dsFront *{animation-play-state:paused !important}
 body.splashOn .page.active{animation:none;opacity:0}
-body.kzLite .gjRays,body.kzLite .gjHex,body.kzLite .gjSil,body.kzLite .gjOrb.o3{display:none}
-@media (prefers-reduced-motion:reduce){#dsBg *{animation:none !important;transition:none !important}.gjSil,.gjOrb{translate:none}}
+body.kzLite .gyShaft,body.kzLite .gyWave.w3{display:none}
+@media (prefers-reduced-motion:reduce){#dsBg *,#dsFront *{animation:none !important}.gyB{display:none}}
 
-/* ---------------------------------------------------------------- D. CARD BACK: readable WANTED poster */
-.hcBack{background:repeating-linear-gradient(0deg,rgba(90,60,25,.04) 0 2px,transparent 2px 5px),linear-gradient(160deg,#f8ecc6,#ecd59a 70%,#dcbd80);color:#24140a}
+/* ---------------------------------------------------------------- D. OPENING SPLASH: Dead Calm (about 6s) */
+#gyIntro{position:fixed;inset:0;z-index:10000;overflow:hidden;color:#eaf8ff;animation:gyAway 0s linear 6.6s forwards}
+html.gySkip #gyIntro{display:none}
+@keyframes gyAway{to{visibility:hidden;pointer-events:none}}
+body.gyLock{overflow:hidden}
+.gyScene{position:absolute;inset:0;background:#02080e;overflow:hidden;animation:gyHide 0s linear 5.5s forwards}
+@keyframes gyHide{to{visibility:hidden}}
+.gyScene > *{pointer-events:none}
+.gySky{position:absolute;inset:0;background:radial-gradient(110% 80% at 50% 58%,#0b3350 0,#06213a 42%,#02080e 100%)}
+.gyRipples{position:absolute;inset:0;width:100%;height:100%}
+.rp{fill:none;stroke:#8fd6ff;stroke-width:1.6;opacity:0;transform-box:fill-box;transform-origin:center;animation:gyRipple 2.6s cubic-bezier(.2,.6,.3,1) calc(.9s + var(--k) * .42s) both}
+@keyframes gyRipple{0%{opacity:.9;transform:scale(.2)}100%{opacity:0;transform:scale(14)}}
+.gyDrop{position:absolute;left:50%;top:0;width:10px;height:14px;margin-left:-5px;border-radius:50% 50% 55% 55%/62% 62% 40% 40%;opacity:0;
+  background:linear-gradient(180deg,#eaf8ff,#6cc3f5);box-shadow:0 0 12px rgba(143,214,255,.8);animation:gyDrop .9s cubic-bezier(.5,0,.9,.6) .1s both}
+@keyframes gyDrop{0%{opacity:0;transform:translate3d(0,0,0)}12%{opacity:1}92%{opacity:1;transform:translate3d(0,56vh,0) scaleY(1.15)}100%{opacity:0;transform:translate3d(0,57vh,0) scale(.6)}}
+.gyRibbons{position:absolute;left:0;bottom:0;width:100%;height:64%;opacity:.9}
+.rb{fill:none;stroke:url(#gyRb);stroke-width:3;stroke-linecap:round;stroke-dasharray:1900;stroke-dashoffset:1900;animation:gyDraw 2.1s cubic-bezier(.4,0,.2,1) calc(1.3s + var(--k) * .22s) forwards}
+.rb:nth-child(2){stroke-width:2}.rb:nth-child(3){stroke-width:4.5}.rb:nth-child(4){stroke-width:1.6}.rb:nth-child(5){stroke-width:2.4}
+@keyframes gyDraw{to{stroke-dashoffset:0}}
+.gyCenter{position:absolute;left:0;right:0;top:50%;transform:translateY(-54%);display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 5vw}
+.gyEmblem{width:clamp(78px,17vmin,128px);height:auto;opacity:0;filter:drop-shadow(0 0 16px rgba(63,167,230,.45));animation:gyEmb 1s cubic-bezier(.2,.8,.2,1) 2.4s forwards}
+@keyframes gyEmb{from{opacity:0;transform:translate3d(0,26px,0) scale(.86)}to{opacity:1;transform:none}}
+.gyName{margin-top:2.4vmin;display:flex;flex-wrap:wrap;justify-content:center;gap:0 .32em;font:800 clamp(34px,8.4vmin + 1vw,84px)/1.05 var(--font-display);letter-spacing:.2em;color:#eef8ff;text-transform:uppercase;opacity:0;animation:gyName 1.3s cubic-bezier(.2,.8,.2,1) 3s forwards}
+@keyframes gyName{from{opacity:0;letter-spacing:.42em;transform:translate3d(0,10px,0)}to{opacity:1;letter-spacing:.2em;transform:none}}
+.gyRule{display:block;width:min(52vw,380px);height:2px;margin-top:2.2vmin;transform:scaleX(0);background:linear-gradient(90deg,transparent,#5bb8f0,#9bebd6,#5bb8f0,transparent);animation:gyRule 1s ease 3.6s forwards}
+@keyframes gyRule{to{transform:none}}
+.gyTag{margin-top:2vmin;font:700 clamp(14px,2.4vmin + .5vw,24px) "Manrope",sans-serif;letter-spacing:.34em;text-transform:uppercase;color:#bfe4f7;opacity:0;animation:gyFade .9s ease 3.9s forwards}
+.gyForm{margin-top:1.4vmin;font:600 clamp(11px,1.7vmin + .3vw,15px) "Manrope",sans-serif;letter-spacing:.08em;color:#7fa9c0;opacity:0;animation:gyFade .9s ease 4.2s forwards}
+@keyframes gyFade{to{opacity:1}}
+.gyProg{position:absolute;left:50%;bottom:max(30px,calc(env(safe-area-inset-bottom) + 22px));width:min(420px,72vw);translate:-50% 0;opacity:0;animation:gyFade .6s ease .4s forwards}
+.gyProg span{display:block;margin-bottom:9px;font:700 11px/1 "Manrope",sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#8fb3c7}
+.gyTrack{display:block;height:3px;border-radius:3px;overflow:hidden;background:rgba(143,214,255,.18)}
+.gyTrack b{display:block;height:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#1d78b8,#5bb8f0 60%,#9bebd6);animation:gyBar 4.3s cubic-bezier(.35,.05,.25,1) .5s forwards}
+@keyframes gyBar{to{transform:scaleX(1)}}
+.gySkipBtn{position:absolute;right:max(14px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));min-height:40px;padding:9px 16px;border-radius:999px;pointer-events:auto !important;cursor:pointer;
+  font:700 12px/1 "Manrope",sans-serif;letter-spacing:.06em;color:#dff1fb;background:rgba(10,40,62,.7);border:1px solid rgba(143,214,255,.4);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:background .25s ease}
+.gySkipBtn:hover{background:rgba(20,70,104,.85)}
+.gySkipBtn:focus-visible{outline:2px solid #9bebd6;outline-offset:2px}
+/* 4.8s -> 6.3s : water rises over the whole screen and clears away, revealing the site */
+.gyRise{position:absolute;left:0;right:0;top:calc(100% + 50px);height:130vh;will-change:transform;animation:gyRiseRun 1.5s linear 4.8s both;
+  background:linear-gradient(180deg,#2a8fd0 0,#1d6fa8 12%,#0c4468 40%,#062a42 100%)}
+.gyRise::before{content:"";position:absolute;left:0;right:0;bottom:calc(100% - 1px);height:46px;background:#2a8fd0;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V20Q40 0 80 20T160 20V40Z'/%3E%3C/svg%3E") 0 100%/160px 46px repeat-x;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V20Q40 0 80 20T160 20V40Z'/%3E%3C/svg%3E") 0 100%/160px 46px repeat-x}
+@keyframes gyRiseRun{
+  0%{transform:translate3d(0,0,0);animation-timing-function:cubic-bezier(.5,0,.3,1)}
+  46%{transform:translate3d(0,-132vh,0);animation-timing-function:linear}
+  54%{transform:translate3d(0,-138vh,0);animation-timing-function:cubic-bezier(.4,0,.6,1)}
+  100%{transform:translate3d(0,-262vh,0)}}
+#gyIntro.gyLeave{animation:gyLeave .45s ease forwards !important}
+@keyframes gyLeave{to{opacity:0;visibility:hidden}}
+#gyIntro.gyCalm{animation:gyLeave .6s ease 1.7s forwards}
+.gyCalm *{animation:none !important}
+.gyCalm .gyDrop,.gyCalm .gyRipples,.gyCalm .gyRise,.gyCalm .gyProg,.gyCalm .gyRibbons{display:none}
+.gyCalm .gyEmblem,.gyCalm .gyName,.gyCalm .gyTag,.gyCalm .gyForm{opacity:1}
+.gyCalm .gyRule{transform:none}
+@media (max-height:520px){.gyCenter{transform:translateY(-50%)}.gyEmblem{width:clamp(48px,14vmin,80px)}}
+
+/* ---------------------------------------------------------------- E. PAGE TRANSITION (1.2s) */
+#gyWarp{position:fixed;inset:0;z-index:9000;overflow:hidden;visibility:hidden;pointer-events:none}
+#gyWarp.on{visibility:visible;pointer-events:auto}
+.gyWv{position:absolute;left:0;right:0;top:0;height:100%;will-change:transform;transform:translate3d(0,calc(100% + 60px),0)}
+.gyWv::before{content:"";position:absolute;left:0;right:0;bottom:calc(100% - 1px);height:46px;background:inherit;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V20Q40 0 80 20T160 20V40Z'/%3E%3C/svg%3E") 0 100%/160px 46px repeat-x;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V20Q40 0 80 20T160 20V40Z'/%3E%3C/svg%3E") 0 100%/160px 46px repeat-x}
+.gyWv1{background:#2a8fd0}
+.gyWv2{background:#062a42}
+#gyWarp.on .gyWv1{animation:gyWIn .34s cubic-bezier(.5,.05,.2,1) both,gyWOut .4s cubic-bezier(.7,0,.9,.5) .8s both}
+#gyWarp.on .gyWv2{animation:gyWIn .34s cubic-bezier(.5,.05,.2,1) .07s both,gyWOut .4s cubic-bezier(.7,0,.9,.5) .87s both}
+@keyframes gyWIn{to{transform:translate3d(0,0,0)}}
+@keyframes gyWOut{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,calc(-100% - 60px),0)}}
+.gyWStage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2vmin;text-align:center;padding:0 5vw}
+.gyWMark{width:clamp(56px,11vmin,92px);height:auto;opacity:0;filter:drop-shadow(0 0 14px rgba(63,167,230,.5))}
+#gyWarp.on .gyWMark{animation:gyWPop .8s cubic-bezier(.2,.8,.2,1) .3s both}
+.gyWTitle{font:800 clamp(34px,7vmin + 2vw,84px)/1.05 var(--font-display);letter-spacing:.04em;color:#eef8ff;opacity:0}
+#gyWarp.on .gyWTitle{animation:gyWPop .8s cubic-bezier(.2,.8,.2,1) .34s both}
+.gyWLine{display:block;width:min(36vw,280px);height:2px;opacity:0;transform:scaleX(0);background:linear-gradient(90deg,transparent,#5bb8f0,#9bebd6,#5bb8f0,transparent)}
+#gyWarp.on .gyWLine{animation:gyWLine .8s ease .4s both}
+@keyframes gyWPop{0%{opacity:0;transform:translate3d(0,14px,0)}30%,70%{opacity:1;transform:none}100%{opacity:0;transform:translate3d(0,-10px,0)}}
+@keyframes gyWLine{0%{opacity:1;transform:scaleX(0)}35%,75%{opacity:1;transform:none}100%{opacity:0;transform:none}}
+@media (prefers-reduced-motion:reduce){#gyWarp{display:none !important}}
+
+
+/* ---------------------------------------------------------------- F. MEET OUR TEAM HERO (rebuilt) */
+.gyTeam{position:relative;isolation:isolate;overflow:hidden;border-radius:24px;border:1px solid rgba(143,214,255,.22);color:#eef8ff;box-shadow:var(--shadow-2);
+  background:radial-gradient(900px 440px at 100% 0%,rgba(63,167,230,.22),transparent 60%),radial-gradient(700px 400px at 0% 100%,rgba(46,156,132,.20),transparent 60%),linear-gradient(145deg,#0a2a40 0%,#071f31 55%,#05151f 100%)}
+.gyTeam::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.10;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='24' viewBox='0 0 48 24'%3E%3Cg fill='none' stroke='%238fd6ff' stroke-width='1'%3E%3Ccircle cx='24' cy='24' r='22'/%3E%3Ccircle cx='24' cy='24' r='16'/%3E%3Ccircle cx='24' cy='24' r='10'/%3E%3Ccircle cx='0' cy='12' r='22'/%3E%3Ccircle cx='0' cy='12' r='16'/%3E%3Ccircle cx='0' cy='12' r='10'/%3E%3Ccircle cx='48' cy='12' r='22'/%3E%3Ccircle cx='48' cy='12' r='16'/%3E%3Ccircle cx='48' cy='12' r='10'/%3E%3C/g%3E%3C/svg%3E") 0 0/48px 24px;
+  -webkit-mask-image:linear-gradient(110deg,#000 0,transparent 58%);mask-image:linear-gradient(110deg,#000 0,transparent 58%)}
+/* split-haori band: solid jade on one half, kikko (tortoise-shell) on the other */
+.gyTeamBand{position:absolute;left:0;right:0;top:0;height:6px;z-index:2;
+  background:linear-gradient(90deg,#1b6b59 0 50%,transparent 50%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='20.78' viewBox='0 0 24 41.57'%3E%3Cg fill='none' stroke='%23e3a947' stroke-width='2.2'%3E%3Cpath d='M12 0L24 6.93V20.79L12 27.72L0 20.79V6.93Z'/%3E%3Cpath d='M0 20.79L12 27.72V41.57L0 48.5'/%3E%3Cpath d='M24 20.79L12 27.72V41.57L24 48.5'/%3E%3C/g%3E%3C/svg%3E") 0 0/12px 20.78px,#6f2a20}
+.gyTeamIn{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(26px,4.5vw,64px);align-items:center;padding:clamp(30px,5vw,64px) clamp(20px,4.5vw,60px)}
+.gyTeamCopy{min-width:0}
+.gyTeamTitle{margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(40px,5.6vw,80px);line-height:1.04;text-wrap:balance;letter-spacing:.005em;color:#eef8ff;text-transform:none}
+.gyTeamTitle span{display:inline-block;padding-bottom:.06em}
+.gyTeamWave{display:block;width:clamp(190px,28vw,320px);height:20px;margin-top:10px;overflow:visible}
+.gyTeamWave path{fill:none;stroke:#5bb8f0;stroke-width:3;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
+.gyTeamLead{max-width:46ch;margin:18px 0 0;font-size:clamp(15px,1.5vw,17px);line-height:1.7;color:rgba(214,236,248,.86)}
+.gyFacts{display:flex;flex-wrap:wrap;gap:16px 0;margin:26px 0 0;padding:0}
+.gyFacts > div{padding:0 22px;min-width:0}
+.gyFacts > div:first-child{padding-left:0}
+.gyFacts > div + div{border-left:1px solid rgba(143,214,255,.24)}
+.gyFacts dt{font-size:12.5px;font-weight:600;color:#8fb3c7}
+.gyFacts dd{margin:4px 0 0;font-family:var(--font-display);font-weight:700;font-size:clamp(19px,2vw,24px);line-height:1.2;color:#eef8ff}
+.gyTeamBtns{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.gyTeamBtns .primary,.gyTeamBtns .heroBtn{min-height:46px}
+.gyTeamBtns .heroBtn{color:#eef8ff;background:rgba(143,214,255,.08);border:1px solid rgba(143,214,255,.38);box-shadow:none}
+.gyTeamBtns .heroBtn:hover{background:rgba(143,214,255,.16)}
+/* squad overview: tidy roster sheet */
+.gySquad{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(8px,1.5vw,18px) clamp(8px,1.4vw,16px);min-width:0}
+.gyFace{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;padding:0;margin:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gyShot{position:relative;display:block;width:100%;aspect-ratio:1;overflow:hidden;border-radius:14px;border:1px solid rgba(143,214,255,.26);background:#0b2a3d;transition:border-color .3s ease,transform .45s var(--ease-out)}
+.gyShot img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 18%;transition:transform .6s var(--ease-out)}
+.gyFace:hover .gyShot,.gyFace:focus-visible .gyShot{border-color:#8fd6ff;transform:translateY(-3px)}
+.gyFace:hover img,.gyFace:focus-visible img{transform:scale(1.07)}
+.gyFace:focus-visible{outline:none}
+.gyFace:focus-visible .gyShot{outline:2px solid #9bebd6;outline-offset:3px}
+.gyFace em{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;font-weight:600;font-size:12px;line-height:1.2;color:#c5e2f2}
+.gyRank{position:absolute;left:5px;bottom:5px;padding:2px 6px;border-radius:999px;font:800 10px/1.3 "Manrope",sans-serif;letter-spacing:.04em;color:#1c1204;background:#e3a947}
+.gyRank.vc{color:#04202f;background:#8fd6ff}
+/* the one orchestrated moment: the squad surfaces out of the water */
+.page.active .gyTeamTitle span{animation:gyWipe 1s var(--ease-out) .1s both}
+.page.active .gyTeamWave path{animation:gyDrawLine 1s cubic-bezier(.4,0,.2,1) .55s both}
+.page.active .gyTeamLead,.page.active .gyFacts,.page.active .gyTeamBtns{animation:gyIn .7s ease .55s both}
+.page.active .gyShot{animation:gySurface .9s var(--ease-out) calc(.2s + var(--i) * 45ms) both}
+.page.active .gyFace em{animation:gyIn .6s ease calc(.55s + var(--i) * 45ms) both}
+@keyframes gyWipe{from{clip-path:inset(0 100% -12% 0);transform:translate3d(-14px,0,0)}to{clip-path:inset(0 0 -12% 0);transform:none}}
+@keyframes gyDrawLine{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes gyIn{from{opacity:0}to{opacity:1}}
+@keyframes gySurface{from{clip-path:inset(100% 0 0 0);opacity:0;transform:translate3d(0,10px,0)}to{clip-path:inset(0);opacity:1;transform:none}}
+@media (max-width:900px){
+  .gyTeamIn{grid-template-columns:1fr;gap:30px}
+  .gyTeamLead{max-width:56ch}
+}
+@media (max-width:560px){
+  .gyTeam{border-radius:18px}
+  .gyTeamIn{padding:30px 18px 26px}
+  .gyFacts > div{padding:0 14px}
+  .gySquad{grid-template-columns:repeat(auto-fill,minmax(54px,1fr))}
+  .gyFace em{font-size:10px;letter-spacing:-.01em;text-overflow:clip}
+  .gyTeamBtns .primary,.gyTeamBtns .heroBtn{flex:1 1 160px}
+}
+@media (prefers-reduced-motion:reduce){
+  .page.active .gyTeamTitle span,.page.active .gyTeamWave path,.page.active .gyTeamLead,.page.active .gyFacts,.page.active .gyTeamBtns,.page.active .gyShot,.page.active .gyFace em{animation:none}
+  .gyShot,.gyShot img{transition:none}
+}
+
+/* ---------------------------------------------------------------- G. HANGING CARDS: Water Hashira palette + readable back */
+.hc{--c1:#5BB8F0;--c2:#9BEBD6}
+.hc.cap{--c1:#E3A947;--c2:#F6D58C}
+.hc.vice{--c1:#9BEBD6;--c2:#4FCDB0}
+.hc.b{--c1:#9BEBD6;--c2:#5BB8F0}
+.hcRail{background:linear-gradient(180deg,#2f7aa0,#14506f 55%,#09304a);box-shadow:0 0 16px rgba(63,167,230,.3)}
+.hc.cap .hcTag,.hc.vice .hcTag{color:#04202f}
+.hcBack{background:repeating-linear-gradient(0deg,rgba(143,214,255,.05) 0 2px,transparent 2px 6px),linear-gradient(160deg,#0f3550,#082439 68%,#051826);color:#eef8ff;border-color:#4a86a8}
+.hcBack::before{border-color:rgba(143,214,255,.5)}
+.hcBack .hcHole{background:#04121c;box-shadow:inset 0 0 0 .13em rgba(143,214,255,.65)}
 .hcBackIn{inset:2.05em 1.15em 1.05em}
-.hcWanted{margin-top:0;font-size:2.3em;letter-spacing:.12em;color:#1e0f05}
-.hcCrew{margin-top:.3em;font:800 max(10px,.68em)/1.1 "Rajdhani",sans-serif;letter-spacing:.12em;color:#4a3015}
+.hcWanted{margin-top:0;font-size:1.75em;letter-spacing:.14em;color:#fff;border-top:.06em solid #5bb8f0;border-bottom:.06em solid #9bebd6}
+.hcCrew{margin-top:.3em;font:800 max(10px,.68em)/1.1 "Rajdhani",sans-serif;letter-spacing:.12em;color:#9fc7dc}
 .hcBack .hcWho{margin-top:.4em}
-.hcBack .hcWho small{font:800 max(10px,.66em)/1.1 "Rajdhani",sans-serif;letter-spacing:.22em;color:#5a3d1a}
-.hcBack .hcWho b{margin-top:.1em;font-size:1.42em;line-height:1.05;color:#1e0f05;letter-spacing:.04em}
-.hcBack .hcRole{margin-top:.12em;font:800 max(12px,.98em)/1.1 "Rajdhani",sans-serif;color:#8f1a14;letter-spacing:.04em}
+.hcBack .hcWho small{font:800 max(10px,.66em)/1.1 "Rajdhani",sans-serif;letter-spacing:.22em;color:#8fb8cf}
+.hcBack .hcWho b{margin-top:.1em;font-size:1.42em;line-height:1.05;color:#fff;letter-spacing:.04em}
+.hcBack .hcRole{margin-top:.12em;font:800 max(12px,.98em)/1.1 "Rajdhani",sans-serif;color:#f2c377;letter-spacing:.04em}
 .hcBack .hcList{gap:.12em;margin-top:.35em}
-.hcBack .hcList > div{grid-template-columns:3.5em minmax(0,1fr);gap:.3em;padding-bottom:.14em;border-bottom:1px solid rgba(60,36,18,.30)}
-.hcBack .hcList dt{font:800 max(10px,.66em)/1.2 "Rajdhani",sans-serif;letter-spacing:.1em;color:#5a3d1a}
-.hcBack .hcList dd{font:800 max(11.5px,.86em)/1.18 "Manrope",sans-serif;color:#1e0f05}
+.hcBack .hcList > div{grid-template-columns:3.5em minmax(0,1fr);gap:.3em;padding-bottom:.14em;border-bottom:1px solid rgba(143,214,255,.26)}
+.hcBack .hcList dt{font:800 max(10px,.66em)/1.2 "Rajdhani",sans-serif;letter-spacing:.1em;color:#8fb8cf}
+.hcBack .hcList dd{font:800 max(11.5px,.86em)/1.18 "Manrope",sans-serif;color:#f2fbff}
 .hcBack .hcStats{margin-top:.42em;gap:.32em}
-.hcBack .hcStats > div{padding:.26em 0;background:rgba(90,56,24,.13);border-color:rgba(90,56,24,.32)}
-.hcBack .hcStats b{font:800 max(14px,1.12em)/1 "Rajdhani",sans-serif;color:#7d150f}
-.hcBack .hcStats small{margin-top:.12em;font:800 max(9px,.6em)/1 "Rajdhani",sans-serif;letter-spacing:.1em;color:#4a3015}
-.hcBounty{padding-top:.25em}
-.hcBounty small{font:800 max(10px,.64em)/1 "Rajdhani",sans-serif;letter-spacing:.34em;color:#4a3015}
-.hcBounty b{font-size:1.7em;color:#1e0f05}
+.hcBack .hcStats > div{padding:.26em 0;background:rgba(91,184,240,.13);border:1px solid rgba(143,214,255,.30)}
+.hcBack .hcStats b{font:800 max(14px,1.12em)/1 "Rajdhani",sans-serif;color:#8fd6ff}
+.hcBack .hcStats small{margin-top:.12em;font:800 max(9px,.6em)/1 "Rajdhani",sans-serif;letter-spacing:.1em;color:#a9cfe3}
+.hcBounty{padding-top:.25em;border-top:.06em solid rgba(143,214,255,.4)}
+.hcBounty small{font:800 max(10px,.64em)/1 "Rajdhani",sans-serif;letter-spacing:.3em;color:#a9cfe3}
+.hcBounty b{font-size:1.7em;color:#fff}
 .teamGrid.hcGrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
 @media (max-width:640px){
   .teamGrid.hcGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 0}
@@ -2925,82 +2999,13 @@ body.kzLite .gjRays,body.kzLite .gjHex,body.kzLite .gjSil,body.kzLite .gjOrb.o3{
   .hc{font-size:14.5px}
 }
 
-/* ---------------------------------------------------------------- E. SMOOTHNESS */
+/* ---------------------------------------------------------------- H. SMOOTHNESS */
 .page.active{animation:pageIn .5s var(--ease-out) both}
 @keyframes pageIn{from{opacity:0;transform:translate3d(0,16px,0)}to{opacity:1;transform:none}}
-.heading h1,.dhTitle b,.ldTitle b,.tmTitle .t3{filter:none;animation:shimmer 14s linear infinite}
 .crest,.primary{animation:none}
-.top{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(238,249,255,.95)}
-body.night .top{background:rgba(6,24,42,.94)}
+.top{-webkit-backdrop-filter:none;backdrop-filter:none}
 .hcWrap{filter:none}
 .hcFace{box-shadow:0 0 1.8em -.5em var(--c1),0 1em 1.3em -.8em rgba(0,0,0,.6)}
 
-/* ==========================================================================
-   DS-24. JUJUTSU KAISEN x GOJO SATORU  —  Infinite Void
-   Limitless Blue + Reversal Red + Hollow Purple on deep indigo, white-hair silver.
-   Original symbols only (hex sigil, infinity mark, blindfold silhouette, cursed-energy orbs).
-   ========================================================================== */
-:root{
-  --bg:#EEF1FF;
-  --bg-grad:radial-gradient(1000px 600px at 88% -10%,rgba(150,100,255,.26),transparent 60%),radial-gradient(900px 560px at 0% 0%,rgba(60,180,255,.22),transparent 58%);
-  --surface:#FFFFFF;--surface-2:#F4F6FF;--surface-3:#E6EBFF;--card-a:#FFFFFF;--card-b:#EEF1FF;
-  --line:rgba(40,50,140,.14);--line-strong:rgba(40,50,140,.28);
-  --text:#0D1030;--text-2:#2A3170;--muted:#5D679E;
-  --gold:#6F3BD6;--gold-2:#9A6BFF;--gold-soft:rgba(130,80,240,.16);
-  --pink:#1F7FD6;--pink-2:#4CC9FF;--pink-soft:rgba(60,170,255,.18);
-  --green:#12905A;--green-soft:rgba(18,144,90,.14);
-  --red:#D4264A;--red-soft:rgba(212,38,74,.12);
-  --shadow-1:0 1px 2px rgba(20,24,90,.08),0 12px 28px -18px rgba(70,70,220,.5);
-  --shadow-2:0 2px 6px rgba(20,24,90,.10),0 28px 52px -28px rgba(110,70,230,.6);
-  --glass:rgba(240,243,255,.86);
-}
-body.night{
-  --bg:#05060F;
-  --bg-grad:radial-gradient(1000px 600px at 88% -10%,rgba(150,90,255,.22),transparent 62%),radial-gradient(900px 560px at 0% 0%,rgba(42,160,255,.20),transparent 58%),radial-gradient(900px 700px at 50% 125%,rgba(255,50,90,.14),transparent 60%);
-  --surface:#0B0E24;--surface-2:#10143A;--surface-3:#171C4C;--card-a:#111641;--card-b:#0A0D2A;
-  --line:rgba(150,170,255,.14);--line-strong:rgba(150,170,255,.30);
-  --text:#F4F6FF;--text-2:#CDD5FF;--muted:#93A0D6;
-  --gold:#B57BFF;--gold-2:#DCC0FF;--gold-soft:rgba(181,123,255,.18);
-  --pink:#4CC9FF;--pink-2:#A9E8FF;--pink-soft:rgba(76,201,255,.16);
-  --green:#3DDC97;--green-soft:rgba(61,220,151,.14);
-  --red:#FF4D6D;--red-soft:rgba(255,77,109,.16);
-  --shadow-1:0 1px 2px rgba(0,0,0,.55),0 12px 30px -18px rgba(76,150,255,.4);
-  --shadow-2:0 2px 8px rgba(0,0,0,.6),0 32px 60px -30px rgba(160,100,255,.4);
-  --glass:rgba(8,10,32,.84);
-}
-body:not(.night) .heading h1{-webkit-text-fill-color:#0d1030;color:#0d1030;text-shadow:0 2px 0 rgba(255,255,255,.7)}
-body:not(.night) .heading p{color:#2a3170}
-.brandText b{letter-spacing:.2em}
-.heading h1{letter-spacing:.07em}
-.top{background:rgba(240,243,255,.95)}
-body.night .top{background:rgba(7,9,28,.95)}
-/* icons: cursed-energy orb instead of the straw hat */
-.panel > h3::before{width:13px;height:13px;margin-right:10px;vertical-align:-1px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#fff,#8fe3ff 38%,#3b7bff 78%);box-shadow:0 0 10px rgba(76,201,255,.85)}
-.ldDiamond{width:20px;height:20px;border-radius:50%;filter:none;background:radial-gradient(circle at 35% 30%,#fff,#e2c8ff 36%,#8a4dff 78%);box-shadow:0 0 14px rgba(170,110,255,.9)}
-/* floating cursed-energy motes replace coins / sakura */
-.dsP.petal.a,.dsP.petal.b,.dsP.heart.a,.dsP.heart.b,.dsP.heart.y{background-image:none;border-radius:50%;width:calc(var(--s) * .42);height:calc(var(--s) * .42)}
-.dsP.petal.a{background:radial-gradient(circle,#fff,#7fdcff 45%,rgba(40,130,255,0) 72%);box-shadow:0 0 8px rgba(76,201,255,.7)}
-.dsP.petal.b{background:radial-gradient(circle,#fff,#c79cff 45%,rgba(120,60,230,0) 72%);box-shadow:0 0 8px rgba(170,110,255,.7)}
-.dsP.heart.a,.dsP.heart.b{background:radial-gradient(circle,#fff,#ff7a92 45%,rgba(220,30,70,0) 72%);box-shadow:0 0 8px rgba(255,77,109,.7)}
-.dsP.heart.y{background:radial-gradient(circle,#fff,#dcc0ff 45%,rgba(150,100,255,0) 72%);box-shadow:0 0 8px rgba(190,150,255,.7)}
-.dsP.spark{background:radial-gradient(circle,#fff 0,#9fdcff 45%,transparent 72%);box-shadow:0 0 10px 2px rgba(120,180,255,.7)}
-/* hanging cards: dark cursed-tech rail + readable "sorcerer file" back */
-.hcRail{background:linear-gradient(180deg,#4b57ad,#232b72 55%,#0f1448);box-shadow:0 0 18px rgba(76,150,255,.35)}
-.hcBack{background:repeating-linear-gradient(0deg,rgba(120,160,255,.05) 0 2px,transparent 2px 6px),linear-gradient(160deg,#171d55,#0b0f35 68%,#070a26);color:#f2f6ff;border-color:#5f78d8}
-.hcBack::before{border-color:rgba(130,180,255,.55)}
-.hcBack .hcHole{background:#05060f;box-shadow:inset 0 0 0 .13em rgba(130,180,255,.65)}
-.hcWanted{color:#fff;text-shadow:0 0 .35em rgba(130,110,255,.9);border-top:.06em solid #4cc9ff;border-bottom:.06em solid #9b6bff;letter-spacing:.14em}
-.hcCrew{color:#a9bcff}
-.hcBack .hcWho small{color:#9fb6ff}
-.hcBack .hcWho b{color:#fff}
-.hcBack .hcRole{color:#ff8da1}
-.hcBack .hcList > div{border-bottom-color:rgba(150,180,255,.26)}
-.hcBack .hcList dt{color:#9fb6ff}
-.hcBack .hcList dd{color:#f2f6ff}
-.hcBack .hcStats > div{background:rgba(120,160,255,.13);border-color:rgba(150,190,255,.30)}
-.hcBack .hcStats b{color:#8fe3ff}
-.hcBack .hcStats small{color:#a9bcff}
-.hcBounty{border-top:.06em solid rgba(150,190,255,.45)}
-.hcBounty small{color:#a9bcff}
-.hcBounty b{color:#fff;text-shadow:0 0 .3em rgba(150,110,255,.8)}
+/* the team hero already carries the page title, so the plain page heading is kept for screen readers only */
+main:has(#team.active) .heading{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
