@@ -138,7 +138,7 @@ function render() {
 const TEAM_ROSTER = [
   {name:"M. Usman", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/M.Usman-RA_Fast_Bowler.jpg"},
   {name:"Sikander", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/Sikander-RA_Fast_Bowler.jpg"},
-  {name:"Awais", role:"All-Rounder", bowling:"Right-Arm Off-Break Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Awais-RA_Off_Break-RH_Batsman.jpg"},
+  {name:"Awais Jameel", role:"All-Rounder", bowling:"Right-Arm Off-Break Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Awais-Jameel-All-Rounder.jpg"},
   {name:"M. Luqman", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", photo:"assets/team/M.Luqman-RA_Fast_Bowler-RH_Batsman.jpg"},
   {name:"Janzaib", role:"Wicket Keeper • Batsman", bowling:"", batting:"Batsman", photo:"assets/team/Janzaib-WK_Batsman.jpg"},
   {name:"Sohail", role:"Batsman", bowling:"", batting:"Right-Hand Batsman", photo:"assets/team/Sohail-RH_Batsman.jpg"},
