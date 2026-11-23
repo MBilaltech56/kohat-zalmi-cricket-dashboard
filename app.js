@@ -15,6 +15,7 @@ let dataRevision = 0;
 let teamRenderedRevision = -1;
 let leadersRenderedRevision = -1;
 let playerPhotosPromise = null;
+let performanceHistory = [];
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -630,6 +631,114 @@ $("#logout").addEventListener("click", async () => {
   await db.auth.signOut(); isAdmin = false; updateAccessUI(); render(); toast("Logged out.", "info");
 });
 
+
+/* ---------- Individual performance history / Undo / Redo ---------- */
+
+const PERFORMANCE_TABLE = "player_performances";
+const performanceFields = ["matches", "innings", "runs", "balls", "dismissals", "overs", "conceded", "wickets"];
+
+function performanceDelta(formData) {
+  const didBat = formData.get("batted") === "on" || n(formData.get("runs")) > 0 || n(formData.get("balls")) > 0;
+  return {
+    matches: 1,
+    innings: didBat ? 1 : 0,
+    runs: n(formData.get("runs")),
+    balls: n(formData.get("balls")),
+    dismissals: n(formData.get("dismissed")),
+    overs: n(formData.get("overs")),
+    conceded: n(formData.get("conceded")),
+    wickets: n(formData.get("wickets"))
+  };
+}
+
+function renderPerformanceHistory() {
+  const host = $("#performanceHistory");
+  if (!host) return;
+  if (!performanceHistory.length) {
+    host.innerHTML = '<p class="muted">No performance records yet. New saved performances will appear here.</p>';
+    return;
+  }
+  host.innerHTML = `<div class="tableWrap"><table><thead><tr><th>Player</th><th>Date</th><th>Batting</th><th>Bowling</th><th>Status</th><th>Action</th></tr></thead><tbody>${
+    performanceHistory.map(r => {
+      const active = !r.is_undone;
+      return `<tr>
+        <td data-label="Player"><b>${esc(r.player_name || playerName(r.player_id))}</b></td>
+        <td data-label="Date">${esc(r.created_at ? new Date(r.created_at).toLocaleString() : "—")}</td>
+        <td data-label="Batting">${n(r.runs)} runs / ${n(r.balls)} balls</td>
+        <td data-label="Bowling">${n(r.wickets)} wkts / ${n(r.overs)} ov / ${n(r.conceded)} runs</td>
+        <td data-label="Status"><span class="statusPill">${active ? "Active" : "Undone"}</span></td>
+        <td data-label="Action">${isAdmin ? (active
+          ? `<button class="action danger" onclick="undoPerformance('${String(r.id)}')">Undo</button>`
+          : `<button class="action" onclick="redoPerformance('${String(r.id)}')">Redo</button>`) : "Admin only"}</td>
+      </tr>`;
+    }).join("")
+  }</tbody></table></div>`;
+}
+function playerName(id) {
+  const p = state.players.find(x => String(x.id) === String(id));
+  return p ? p.name : "Unknown player";
+}
+async function loadPerformanceHistory() {
+  const { data, error } = await db.from(PERFORMANCE_TABLE).select("*").order("created_at", { ascending: false }).limit(100);
+  if (error) {
+    const host = $("#performanceHistory");
+    if (host) host.innerHTML = '<p class="muted">Run SUPABASE_UNDO_REDO_SETUP.sql in Supabase SQL Editor to enable performance history.</p>';
+    return;
+  }
+  performanceHistory = data || [];
+  renderPerformanceHistory();
+}
+async function changePlayerTotals(record, direction) {
+  const p = state.players.find(x => String(x.id) === String(record.player_id));
+  if (!p) throw new Error("The player for this performance was not found. No changes were made.");
+  const payload = {};
+  for (const field of performanceFields) {
+    if (field === "innings" && !supportsInnings) continue;
+    payload[field] = Math.max(0, n(p[field]) + direction * n(record[field]));
+  }
+  const { data, error } = await db.from("kohat zalmi").update(payload).eq("id", p.id).select().single();
+  if (error) throw error;
+  Object.assign(p, data);
+}
+async function undoPerformance(id) {
+  if (!isAdmin) return toast("Admin login required.", "info");
+  const record = performanceHistory.find(x => String(x.id) === String(id));
+  if (!record || record.is_undone) return;
+  if (!confirm(`Undo ${record.player_name || playerName(record.player_id)}'s performance?`)) return;
+  try {
+    await changePlayerTotals(record, -1);
+    const { error } = await db.from(PERFORMANCE_TABLE).update({ is_undone: true, undone_at: new Date().toISOString() }).eq("id", record.id).eq("is_undone", false);
+    if (error) {
+      await changePlayerTotals(record, 1);
+      throw error;
+    }
+    record.is_undone = true;
+    dataRevision++; teamRenderedRevision = -1; leadersRenderedRevision = -1;
+    render(); renderPerformanceHistory();
+    toast("Performance undone. Player's totals have been updated.");
+  } catch (err) { toast("Undo failed: " + err.message, "err"); }
+}
+async function redoPerformance(id) {
+  if (!isAdmin) return toast("Admin login required.", "info");
+  const record = performanceHistory.find(x => String(x.id) === String(id));
+  if (!record || !record.is_undone) return;
+  if (!confirm(`Redo ${record.player_name || playerName(record.player_id)}'s performance?`)) return;
+  try {
+    await changePlayerTotals(record, 1);
+    const { error } = await db.from(PERFORMANCE_TABLE).update({ is_undone: false, undone_at: null }).eq("id", record.id).eq("is_undone", true);
+    if (error) {
+      await changePlayerTotals(record, -1);
+      throw error;
+    }
+    record.is_undone = false;
+    dataRevision++; teamRenderedRevision = -1; leadersRenderedRevision = -1;
+    render(); renderPerformanceHistory();
+    toast("Performance restored successfully.");
+  } catch (err) { toast("Redo failed: " + err.message, "err"); }
+}
+window.undoPerformance = undoPerformance;
+window.redoPerformance = redoPerformance;
+
 $("#playerForm").addEventListener("submit", async e => {
   e.preventDefault();
   if (!isAdmin) return openAuth();
@@ -660,22 +769,33 @@ $("#perfForm").addEventListener("submit", async e => {
   const f = new FormData(e.target);
   const p = state.players.find(x => String(x.id) === String(f.get("player")));
   if (!p) return toast("Add a player first.", "err");
-  const didBat = f.get("batted") === "on" || n(f.get("runs")) > 0 || n(f.get("balls")) > 0;
-  const u = {
-    matches: n(p.matches) + 1,
-    ...(supportsInnings ? { innings: n(p.innings) + (didBat ? 1 : 0) } : {}),
-    runs: n(p.runs) + n(f.get("runs")),
-    balls: n(p.balls) + n(f.get("balls")),
-    dismissals: n(p.dismissals) + n(f.get("dismissed")),
-    overs: n(p.overs) + n(f.get("overs")),
-    conceded: n(p.conceded) + n(f.get("conceded")),
-    wickets: n(p.wickets) + n(f.get("wickets"))
+  const d = performanceDelta(f);
+  const record = {
+    player_id: String(p.id),
+    player_name: p.name,
+    runs: d.runs, balls: d.balls, dismissals: d.dismissals,
+    overs: d.overs, conceded: d.conceded, wickets: d.wickets,
+    matches: d.matches, innings: d.innings,
+    is_undone: false
   };
-  const { data, error } = await db.from("kohat zalmi").update(u).eq("id", p.id).select().single();
-  if (error) return toast("Could not save performance: " + error.message, "err");
-  Object.assign(p, data); dataRevision++; teamRenderedRevision = -1; leadersRenderedRevision = -1;
-  e.target.reset(); render(); go("players");
-  toast(supportsInnings ? "Performance saved successfully." : "Performance saved. Run the innings SQL migration to enable innings tracking.", supportsInnings ? "ok" : "info");
+  // Save the individual record first so it can be corrected later.
+  const { data: saved, error: historyError } = await db.from(PERFORMANCE_TABLE).insert([record]).select().single();
+  if (historyError) return toast("Could not save performance history: " + historyError.message + ". Run SUPABASE_UNDO_REDO_SETUP.sql first.", "err");
+  const payload = {};
+  for (const field of performanceFields) {
+    if (field === "innings" && !supportsInnings) continue;
+    payload[field] = n(p[field]) + n(d[field]);
+  }
+  const { data, error } = await db.from("kohat zalmi").update(payload).eq("id", p.id).select().single();
+  if (error) {
+    await db.from(PERFORMANCE_TABLE).delete().eq("id", saved.id);
+    return toast("Could not update player totals: " + error.message, "err");
+  }
+  Object.assign(p, data);
+  performanceHistory.unshift(saved);
+  dataRevision++; teamRenderedRevision = -1; leadersRenderedRevision = -1;
+  e.target.reset(); render(); renderPerformanceHistory(); go("players");
+  toast(supportsInnings ? "Performance saved with Undo/Redo history." : "Performance saved. Run the innings migration to enable innings tracking.", supportsInnings ? "ok" : "info");
 });
 
 $("#matchForm").addEventListener("submit", async e => {
@@ -792,6 +912,7 @@ async function init() {
     if (m.error) console.error(m.error); else state.matches = m.data || [];
     dataRevision++;
     updateAccessUI(); render();
+    await loadPerformanceHistory();
   } catch (err) {
     console.error(err);
     toast("Website initialization error: " + err.message, "err");
@@ -800,7 +921,7 @@ async function init() {
 
 db.auth.onAuthStateChange((_event, session) => {
   isAdmin = String(session?.user?.id || "") === OWNER_UID;
-  updateAccessUI(); render();
+  updateAccessUI(); render(); renderPerformanceHistory();
 });
 
 init();
