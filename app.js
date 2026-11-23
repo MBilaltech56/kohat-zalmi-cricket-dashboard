@@ -8,8 +8,13 @@ const SUPABASE_KEY = "sb_publishable_yKCdQBSPvkisSWncHbGmBg_-6u9DEyP";
 const OWNER_UID = "f62ca7bc-486d-462f-92dd-6415e0e90973";
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let state = { players: [], matches: [] };
+let state = { players: [], matches: [], photosLoaded: false };
 let isAdmin = false;
+let supportsInnings = true;
+let dataRevision = 0;
+let teamRenderedRevision = -1;
+let leadersRenderedRevision = -1;
+let playerPhotosPromise = null;
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -84,7 +89,7 @@ function go(page) {
   const titles = {
     dashboard: "Team Dashboard", players: "Players", matches: "Matches", rankings: "Rankings",
     analytics: "Analytics", venues: "Venues", leaders: "The Leaders of Kohat Zalmi", team: "Meet Our Team",
-    add: "Add Performance", addPlayer: "Add Player"
+    journey: "Our Journey", add: "Add Performance", addPlayer: "Add Player"
   };
   $("#title").textContent = titles[page] || "Kohat Zalmi";
   $("#desc").textContent = page === "dashboard"
@@ -92,12 +97,12 @@ function go(page) {
     : isAdmin ? "Kohat Zalmi • admin connected" : "Kohat Zalmi • public view";
   closeNav();
   render();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo(0, 0);
 }
 
 /* ---------- Render ---------------------------------------------------- */
 
-function render() {
+function renderDashboard() {
   const p = state.players || [], m = state.matches || [], r = results();
   const runs = p.reduce((a, x) => a + n(x.runs), 0);
   const wk = p.reduce((a, x) => a + n(x.wickets), 0);
@@ -128,59 +133,77 @@ function render() {
   $("#recent").innerHTML = [...m].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 5)
     .map((x, i) => `<div class="performer" style="animation-delay:${i * 60}ms"><div class="grow"><b>${esc(x.opponent)}</b><small>${esc(x.date)} • ${esc(x.venue)}</small></div><b>${esc(x.result)}</b></div>`).join("") || `<div class="muted">No matches yet.</div>`;
 
-  renderPlayers(); renderMatches(); renderRankings(); renderAnalytics(); renderVenues(); renderTeam();
-  fillPlayerSelect(); updateAccessUI();
-  animateNumbers(); observeReveals();
+  animateNumbers();
+  observeReveals($("#dashboard"));
+}
+
+function render() {
+  const active = $(".page.active")?.id || "dashboard";
+  if (active === "dashboard") renderDashboard();
+  else if (active === "players") {
+    renderPlayers();
+    ensurePlayerPhotos();
+  }
+  else if (active === "matches") renderMatches();
+  else if (active === "rankings") renderRankings();
+  else if (active === "analytics") { renderAnalytics(); observeReveals($("#analytics")); }
+  else if (active === "venues") { renderVenues(); observeReveals($("#venues")); }
+  else if (active === "team") renderTeam();
+  else if (active === "leaders") renderLeaders();
+  else if (active === "journey") observeReveals($("#journey"));
+  fillPlayerSelect();
+  updateAccessUI();
 }
 
 /* ---------- Players ---------------------------------------------------- */
 
 const TEAM_ROSTER = [
-  {name:"M. Usman", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/M.Usman-RA_Fast_Bowler.jpg"},
-  {name:"Sikander", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/Sikander-RA_Fast_Bowler.jpg"},
-  {name:"Awais Jameel", role:"All-Rounder", bowling:"Right-Arm Off-Break Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Awais-Jameel-All-Rounder.jpg"},
-  {name:"M. Luqman", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", photo:"assets/team/M.Luqman-RA_Fast_Bowler-RH_Batsman.jpg"},
-  {name:"Janzaib", role:"Wicket Keeper • Batsman", bowling:"", batting:"Batsman", photo:"assets/team/Janzaib-WK_Batsman.jpg"},
-  {name:"Sohail", role:"Batsman", bowling:"", batting:"Right-Hand Batsman", photo:"assets/team/Sohail-RH_Batsman.jpg"},
-  {name:"Farhan", role:"Bowler", bowling:"Left-Arm Wrist Spinner", batting:"", photo:"assets/team/Farhan-LA_Wrist_Spiner.jpg"},
-  {name:"Adnan", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Adnan-RA_Fast_Bowler-RH_Batsman.jpg"},
-  {name:"Shahzad", role:"All-Rounder", bowling:"Right-Arm Off-Break Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Shahzad-RA_Off_Break-RH_Batsman.jpg"},
-  {name:"Naimat", role:"Bowler", bowling:"Right-Arm Leg-Break Bowler", batting:"", photo:"assets/team/Naimat-RA_Leg_Break.jpg"},
-  {name:"M. Bilal", role:"All-Rounder", bowling:"Right-Arm Slow Wrist Spinner", batting:"Right-Hand Batsman", captain:"Vice Captain", jersey:"56", photo:"assets/team/M.Bilal-RH_Slow_Wrist_Spiner-RH_Batsman-Vice_Captain.jpg"},
-  {name:"M. Jibran", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", captain:"Captain", jersey:"07", photo:"assets/team/M.Jibran-RA_Fast_Bowler-RH_Batsman-Captain.jpg"},
-  {name:"Maidad", role:"Wicket Keeper • Batsman", bowling:"", batting:"Batsman", photo:"assets/team/Maidad-WK_Batsman.jpg"},
-  {name:"SanaUllah", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/SanaUllah-RA_Fast_Bowler.jpg"},
-  {name:"Shahab", role:"Batsman", bowling:"", batting:"Right-Hand Batsman", photo:"assets/team/Shahab-RH_Batsman.jpg"}
+  {name:"M. Usman", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/M.Usman-RA_Fast_Bowler.webp"},
+  {name:"Sikander", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/Sikander-RA_Fast_Bowler.webp"},
+  {name:"Awais Jameel", role:"All-Rounder", bowling:"Right-Arm Off-Break Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Awais-Jameel-All-Rounder.webp"},
+  {name:"M. Luqman", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", photo:"assets/team/M.Luqman-RA_Fast_Bowler-RH_Batsman.webp"},
+  {name:"Janzaib", role:"Wicket Keeper • Batsman", bowling:"", batting:"Batsman", photo:"assets/team/Janzaib-WK_Batsman.webp"},
+  {name:"Sohail", role:"Batsman", bowling:"", batting:"Right-Hand Batsman", photo:"assets/team/Sohail-RH_Batsman.webp"},
+  {name:"Farhan", role:"Bowler", bowling:"Left-Arm Wrist Spinner", batting:"", photo:"assets/team/Farhan-LA_Wrist_Spiner.webp"},
+  {name:"Adnan", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Adnan-RA_Fast_Bowler-RH_Batsman.webp"},
+  {name:"Shahzad", role:"All-Rounder", bowling:"Right-Arm Off-Break Bowler", batting:"Right-Hand Batsman", photo:"assets/team/Shahzad-RA_Off_Break-RH_Batsman.webp"},
+  {name:"Naimat", role:"Bowler", bowling:"Right-Arm Leg-Break Bowler", batting:"", photo:"assets/team/Naimat-RA_Leg_Break.webp"},
+  {name:"M. Bilal", role:"All-Rounder", bowling:"Right-Arm Slow Wrist Spinner", batting:"Right-Hand Batsman", captain:"Vice Captain", jersey:"56", photo:"assets/team/M.Bilal-RH_Slow_Wrist_Spiner-RH_Batsman-Vice_Captain.webp"},
+  {name:"M. Jibran", role:"All-Rounder", bowling:"Right-Arm Fast Bowler", batting:"Right-Hand Batsman", captain:"Captain", jersey:"07", photo:"assets/team/M.Jibran-RA_Fast_Bowler-RH_Batsman-Captain.webp"},
+  {name:"Maidad", role:"Wicket Keeper • Batsman", bowling:"", batting:"Batsman", photo:"assets/team/Maidad-WK_Batsman.webp"},
+  {name:"SanaUllah", role:"Bowler", bowling:"Right-Arm Fast Bowler", batting:"", photo:"assets/team/SanaUllah-RA_Fast_Bowler.webp"},
+  {name:"Shahab", role:"Batsman", bowling:"", batting:"Right-Hand Batsman", photo:"assets/team/Shahab-RH_Batsman.webp"}
 ];
 
 function renderTeam() {
   const grid = $("#teamGrid");
   if (!grid) return;
+  if (teamRenderedRevision === dataRevision && grid.children.length) return;
   $("#teamCount").textContent = TEAM_ROSTER.length + " Players";
   if (typeof buildTeamReel === "function") buildTeamReel(TEAM_ROSTER);
   if (typeof renderHangCards === "function") {
     renderHangCards(grid, TEAM_ROSTER, "team");
-    renderHangCards($("#leaderHang"), TEAM_ROSTER.filter(p => p.captain).sort((a, b) => (a.captain === "Captain" ? -1 : 1) - (b.captain === "Captain" ? -1 : 1)), "leader");
-    return;
-  }
-  grid.innerHTML = TEAM_ROSTER.map((p,i) => `
-    <article class="teamPlayerCard" style="--delay:${Math.min(i,11)*55}ms">
-      <div class="teamCardGlow"></div>
-      <div class="teamPhotoFrame">
-        <div class="teamPhotoHalo"></div>
-        <img src="${p.photo}" alt="${esc(p.name)}" loading="lazy">
-        ${p.captain ? `<span class="teamCaptainBadge ${p.captain === "Captain" ? "isCaptain" : "isVice"}">${esc(p.captain)}</span>` : ""}
-      </div>
-      <div class="teamCardBody">
-        <div class="teamRole">${esc(p.role)}</div>
-        <h3>${esc(p.name)}</h3>
-        ${p.jersey ? `<div class="teamJersey">#${esc(p.jersey)}</div>` : ""}
-        <div class="teamInfoList">
-          ${p.batting ? `<span><b>BAT</b>${esc(p.batting)}</span>` : ""}
-          ${p.bowling ? `<span><b>BOWL</b>${esc(p.bowling)}</span>` : ""}
+  } else {
+    grid.innerHTML = TEAM_ROSTER.map((p,i) => `
+      <article class="teamPlayerCard" style="--delay:${Math.min(i,11)*55}ms">
+        <div class="teamCardGlow"></div><div class="teamPhotoFrame"><div class="teamPhotoHalo"></div>
+          <img src="${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy" decoding="async">
+          ${p.captain ? `<span class="teamCaptainBadge ${p.captain === "Captain" ? "isCaptain" : "isVice"}">${esc(p.captain)}</span>` : ""}
+        </div><div class="teamCardBody"><div class="teamRole">${esc(p.role)}</div><h3>${esc(p.name)}</h3>
+          ${p.jersey ? `<div class="teamJersey">#${esc(p.jersey)}</div>` : ""}
+          <div class="teamInfoList">${p.batting ? `<span><b>BAT</b>${esc(p.batting)}</span>` : ""}${p.bowling ? `<span><b>BOWL</b>${esc(p.bowling)}</span>` : ""}</div>
         </div>
-      </div>
-    </article>`).join("");
+      </article>`).join("");
+  }
+  teamRenderedRevision = dataRevision;
+}
+
+function renderLeaders() {
+  const host = $("#leaderHang");
+  if (!host || (leadersRenderedRevision === dataRevision && host.children.length)) return;
+  const leaders = TEAM_ROSTER.filter(p => p.captain).sort((a, b) => (a.captain === "Captain" ? -1 : 1) - (b.captain === "Captain" ? -1 : 1));
+  if (typeof renderHangCards === "function") renderHangCards(host, leaders, "leader");
+  leadersRenderedRevision = dataRevision;
 }
 
 function renderPlayers() {
@@ -191,6 +214,7 @@ function renderPlayers() {
     <div class="playerTop">${avatar(x)}<div class="grow"><h3>${esc(x.name)}</h3><small>${esc(x.role)} • #${esc(x.jersey)}</small></div></div>
     <div class="mini playerStats">
       <div><b>${n(x.matches)}</b><small>Matches</small></div>
+      <div><b>${n(x.innings)}</b><small>Innings</small></div>
       <div><b>${n(x.runs)}</b><small>Runs</small></div>
       <div><b>${fmt(avg(x))}</b><small>Avg</small></div>
       <div><b>${fmt(sr(x))}</b><small>SR</small></div>
@@ -207,6 +231,7 @@ function showPlayer(id) {
   $("#playerDetail").innerHTML = `<div class="detailHead">${avatar(p, "large")}<div><h2>${esc(p.name)}</h2><p>${esc(p.role)} • #${esc(p.jersey)}</p></div></div>
     <div class="mini">
       <div><b>${n(p.matches)}</b><small>Matches</small></div>
+      <div><b>${n(p.innings)}</b><small>Innings</small></div>
       <div><b>${n(p.runs)}</b><small>Runs</small></div>
       <div><b>${n(p.wickets)}</b><small>Wickets</small></div>
     </div>
@@ -222,10 +247,16 @@ function editPlayer(id) {
   const p = state.players.find(x => String(x.id) === String(id));
   if (!p) return;
   const f = $("#editPlayerForm");
-  f.id.value = String(p.id);
-  f.name.value = p.name || "";
-  f.jersey.value = p.jersey || "";
-  f.role.value = p.role || "";
+  const setField = (name, value) => {
+    const field = f.elements.namedItem(name);
+    if (field) field.value = value ?? "";
+  };
+  setField("id", String(p.id));
+  setField("name", p.name || "");
+  setField("jersey", p.jersey || "");
+  setField("role", p.role || "");
+  setField("matches", n(p.matches));
+  setField("innings", n(p.innings));
   closeModal("#playerModal");
   openModal("#editPlayerModal");
 }
@@ -237,6 +268,7 @@ async function deletePlayer(id) {
   const { error } = await db.from("kohat zalmi").delete().eq("id", id);
   if (error) return toast("Delete failed: " + error.message, "err");
   state.players = state.players.filter(x => String(x.id) !== String(id));
+  dataRevision++; teamRenderedRevision = -1; leadersRenderedRevision = -1;
   closePlayerModal(); render(); toast("Player deleted.");
 }
 
@@ -269,12 +301,16 @@ function editMatch(id) {
   const m = state.matches.find(x => String(x.id) === String(id));
   if (!m) return;
   const f = $("#editMatchForm");
-  f.id.value = String(m.id);
-  f.date.value = m.date || "";
-  f.opponent.value = m.opponent || "";
-  f.venue.value = m.venue || "";
-  f.result.value = m.result || "Won";
-  f.score.value = m.score || "";
+  const setField = (name, value) => {
+    const field = f.elements.namedItem(name);
+    if (field) field.value = value ?? "";
+  };
+  setField("id", String(m.id));
+  setField("date", m.date || "");
+  setField("opponent", m.opponent || "");
+  setField("venue", m.venue || "");
+  setField("result", m.result || "Won");
+  setField("score", m.score || "");
   openModal("#editMatchModal");
 }
 
@@ -348,8 +384,8 @@ function renderRankings() {
       <div class="rkScore"><b>${S.show(S.val(p))}</b><small>${S.label}</small></div>
       <div class="rkBar"><u></u></div>
       <div class="rkStats">
-        ${tile("runs", n(p.runs), "RUNS")}${tile("avg", fmt(avg(p)), "AVG")}${tile("sr", fmt(sr(p)), "SR")}
-        ${tile("wkts", n(p.wickets), "WKTS")}${tile("eco", n(p.overs) ? fmt(eco(p)) : "—", "ECO")}${tile("", n(p.matches), "MATCHES")}
+        ${tile("runs", n(p.runs), "RUNS")}${tile("innings", n(p.innings), "INNINGS")}${tile("avg", fmt(avg(p)), "AVG")}
+        ${tile("sr", fmt(sr(p)), "SR")}${tile("wkts", n(p.wickets), "WKTS")}${tile("eco", n(p.overs) ? fmt(eco(p)) : "—", "ECO")}${tile("", n(p.matches), "MATCHES")}
       </div>
     </article>`).join("") || `<p class="rkEmpty">No players to rank yet.</p>`;
 }
@@ -405,6 +441,19 @@ function renderVenues() {
 
 function fillPlayerSelect() {
   $("#perfPlayer").innerHTML = state.players.map(p => `<option value="${String(p.id)}">${esc(p.name)} — ${esc(p.role)} (#${esc(p.jersey)})</option>`).join("") || `<option value="">No players — add a player first</option>`;
+}
+
+
+function ensurePlayerPhotos() {
+  if (state.photosLoaded || playerPhotosPromise) return playerPhotosPromise;
+  playerPhotosPromise = db.from("kohat zalmi").select("id,photo").then(({ data, error }) => {
+    if (error) { console.warn("Player photos could not be loaded:", error.message); return; }
+    const byId = new Map((data || []).map(x => [String(x.id), x.photo || ""]));
+    state.players.forEach(p => { if (byId.has(String(p.id))) p.photo = byId.get(String(p.id)); });
+    state.photosLoaded = true;
+    if ($(".page.active")?.id === "players") renderPlayers();
+  }).catch(err => console.warn("Player photos could not be loaded:", err));
+  return playerPhotosPromise;
 }
 
 function fillBestPlayerSelects() {
@@ -488,9 +537,10 @@ function animateNumbers() {
 }
 
 let revealObserver = null;
-function observeReveals() {
+function observeReveals(root = document) {
+  if (!root) return;
   if (!("IntersectionObserver" in window)) {
-    $$(".reveal").forEach(el => el.classList.add("in"));
+    root.querySelectorAll(".reveal,.journeyReveal").forEach(el => el.classList.add("in"));
     return;
   }
   revealObserver ??= new IntersectionObserver(entries => {
@@ -498,7 +548,7 @@ function observeReveals() {
       if (e.isIntersecting) { e.target.classList.add("in"); revealObserver.unobserve(e.target); }
     });
   }, { rootMargin: "0px 0px -8% 0px", threshold: .08 });
-  $$(".reveal:not(.in)").forEach(el => revealObserver.observe(el));
+  root.querySelectorAll(".reveal:not(.in),.journeyReveal:not(.in)").forEach(el => revealObserver.observe(el));
 }
 
 /* ---------- Theme ---------------------------------------------------------- */
@@ -595,10 +645,13 @@ $("#playerForm").addEventListener("submit", async e => {
     role: String(f.get("role") || ""),
     photo, matches: 0, runs: 0, balls: 0, dismissals: 0, overs: 0, conceded: 0, wickets: 0
   };
+  if (supportsInnings) p.innings = 0;
   if (!p.name) return toast("Enter a player name.", "err");
   const { data, error } = await db.from("kohat zalmi").insert([p]).select().single();
   if (error) return toast("Could not add player: " + error.message, "err");
-  state.players.push(data); e.target.reset(); render(); go("players"); toast("Player added successfully.");
+  state.players.push(data); dataRevision++; teamRenderedRevision = -1; leadersRenderedRevision = -1;
+  if (photo) p.photo = photo;
+  e.target.reset(); render(); go("players"); toast("Player added successfully.");
 });
 
 $("#perfForm").addEventListener("submit", async e => {
@@ -607,8 +660,10 @@ $("#perfForm").addEventListener("submit", async e => {
   const f = new FormData(e.target);
   const p = state.players.find(x => String(x.id) === String(f.get("player")));
   if (!p) return toast("Add a player first.", "err");
+  const didBat = f.get("batted") === "on" || n(f.get("runs")) > 0 || n(f.get("balls")) > 0;
   const u = {
     matches: n(p.matches) + 1,
+    ...(supportsInnings ? { innings: n(p.innings) + (didBat ? 1 : 0) } : {}),
     runs: n(p.runs) + n(f.get("runs")),
     balls: n(p.balls) + n(f.get("balls")),
     dismissals: n(p.dismissals) + n(f.get("dismissed")),
@@ -618,7 +673,9 @@ $("#perfForm").addEventListener("submit", async e => {
   };
   const { data, error } = await db.from("kohat zalmi").update(u).eq("id", p.id).select().single();
   if (error) return toast("Could not save performance: " + error.message, "err");
-  Object.assign(p, data); e.target.reset(); render(); go("players"); toast("Performance saved successfully.");
+  Object.assign(p, data); dataRevision++; teamRenderedRevision = -1; leadersRenderedRevision = -1;
+  e.target.reset(); render(); go("players");
+  toast(supportsInnings ? "Performance saved successfully." : "Performance saved. Run the innings SQL migration to enable innings tracking.", supportsInnings ? "ok" : "info");
 });
 
 $("#matchForm").addEventListener("submit", async e => {
@@ -654,7 +711,7 @@ $("#matchForm").addEventListener("submit", async e => {
     }
   }
   if (error) return toast("Could not save match: " + error.message, "err");
-  state.matches.push(data); e.target.reset(); closeModal("#matchModal"); render(); go("matches"); toast("Match saved successfully.");
+  state.matches.push(data); dataRevision++; e.target.reset(); closeModal("#matchModal"); render(); go("matches"); toast("Match saved successfully.");
 });
 
 $("#editPlayerForm").addEventListener("submit", async e => {
@@ -667,12 +724,14 @@ $("#editPlayerForm").addEventListener("submit", async e => {
   const payload = {
     name: String(f.get("name") || "").trim(),
     jersey: String(f.get("jersey") || "").trim(),
-    role: String(f.get("role") || "").trim()
+    role: String(f.get("role") || "").trim(),
+    matches: Math.max(0, Math.floor(n(f.get("matches"))))
   };
+  if (supportsInnings) payload.innings = Math.max(0, Math.floor(n(f.get("innings"))));
   if (!payload.name) return toast("Enter a player name.", "err");
   const { data, error } = await db.from("kohat zalmi").update(payload).eq("id", id).select().single();
   if (error) return toast("Update failed: " + error.message, "err");
-  Object.assign(p, data);
+  Object.assign(p, data); dataRevision++; teamRenderedRevision = -1; leadersRenderedRevision = -1;
   closeModal("#editPlayerModal"); render(); toast("Player updated successfully.");
 });
 
@@ -689,8 +748,27 @@ $("#editMatchForm").addEventListener("submit", async e => {
   };
   const { data, error } = await db.from("matches").update(payload).eq("id", id).select().single();
   if (error) return toast("Update failed: " + error.message, "err");
-  Object.assign(m, data);
+  Object.assign(m, data); dataRevision++;
   closeModal("#editMatchModal"); render(); toast("Match updated successfully.");
+});
+
+
+/* ---------- Our Journey language switch ----------------------------------- */
+document.addEventListener("click", e => {
+  const button = e.target.closest("[data-journey-lang]");
+  if (!button) return;
+  const lang = button.dataset.journeyLang === "ur" ? "ur" : "en";
+  const page = $("#journey");
+  if (!page) return;
+  page.dataset.language = lang;
+  page.querySelectorAll("[data-journey-en]").forEach(el => { el.hidden = lang !== "en"; });
+  page.querySelectorAll("[data-journey-ur]").forEach(el => { el.hidden = lang !== "ur"; });
+  page.querySelectorAll("[data-journey-copy]").forEach(el => { el.hidden = el.dataset.journeyCopy !== lang; });
+  page.querySelectorAll("[data-journey-lang]").forEach(btn => {
+    const active = btn.dataset.journeyLang === lang;
+    btn.classList.toggle("isActive", active);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+  });
 });
 
 /* ---------- Init --------------------------------------------------------------- */
@@ -699,12 +777,20 @@ async function init() {
   try {
     const session = await db.auth.getSession();
     isAdmin = String(session.data.session?.user?.id || "") === OWNER_UID;
-    const [p, m] = await Promise.all([
-      db.from("kohat zalmi").select("*").order("id", { ascending: true }),
+    const [pResult, m] = await Promise.all([
+      db.from("kohat zalmi").select("id,name,jersey,role,matches,innings,runs,balls,dismissals,overs,conceded,wickets").order("id", { ascending: true }),
       db.from("matches").select("*").order("date", { ascending: false })
     ]);
-    if (p.error) console.error(p.error); else state.players = p.data || [];
+    let p = pResult;
+    if (p.error && /innings/i.test(p.error.message || "")) {
+      supportsInnings = false;
+      p = await db.from("kohat zalmi").select("id,name,jersey,role,matches,runs,balls,dismissals,overs,conceded,wickets").order("id", { ascending: true });
+      toast("One-time setup needed: run SUPABASE_INNINGS_MIGRATION.sql in your Supabase SQL Editor.", "info");
+    }
+    if (p.error) console.error(p.error);
+    else state.players = (p.data || []).map(player => ({ ...player, innings: n(player.innings) }));
     if (m.error) console.error(m.error); else state.matches = m.data || [];
+    dataRevision++;
     updateAccessUI(); render();
   } catch (err) {
     console.error(err);

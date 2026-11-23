@@ -11,6 +11,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Shippori+Mincho+B1:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <script>try{if(sessionStorage.getItem("kzIntroSeen")==="1")document.documentElement.className+=" gySkip"}catch(e){}</script>
+<link rel="preload" as="image" href="assets/hero.webp" fetchpriority="high">
+<link rel="preconnect" href="https://szojybwguxkydkdombqo.supabase.co">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -40,8 +42,8 @@
   </symbol>
 </defs></svg>
 
-<!-- ===== opening splash: DEAD CALM (about 6s, once per browser session) =====
-     0-1s a drop falls | 1-3s ripples + water ribbons | 2.4-4.3s emblem + KOHAT ZALMI | 4.8-6s water rises and reveals the site -->
+<!-- ===== opening splash: DEAD CALM (about 9s, once per browser session) =====
+     0-1s a drop falls | 1-4s ripples + water ribbons | 2.4-5s emblem + KOHAT ZALMI | 7.5-9s water rises and reveals the site -->
 <div id="gyIntro" role="img" aria-label="Kohat Zalmi, We Are Friends. Loading.">
   <div class="gyScene">
     <div class="gySky"></div>
@@ -92,8 +94,8 @@
   }
   var rise = root.querySelector(".gyRise");
   if (rise) rise.addEventListener("animationend", function (e) { if (e.animationName === "gyRiseRun") finish(); });
-  setTimeout(reveal, calm ? 1600 : 5500);
-  setTimeout(finish, calm ? 2300 : 7000);          /* safety net: never block the site */
+  setTimeout(reveal, calm ? 160 : 8700);
+  setTimeout(finish, calm ? 260 : 9500);          /* 9-second splash safety net */
   var skip = document.getElementById("gySkipBtn");
   if (skip) skip.addEventListener("click", function () {
     root.classList.add("gyLeave"); reveal(); setTimeout(finish, 450);
@@ -156,6 +158,7 @@
     <button class="nav" data-page="venues"><span aria-hidden="true">📍</span> Venues</button>
     <button class="nav" data-page="leaders"><span aria-hidden="true">👑</span> Leaders</button>
     <button class="nav" data-page="team"><span aria-hidden="true">👥</span> Meet Our Team</button>
+    <button class="nav" data-page="journey"><span aria-hidden="true">✨</span> Our Journey</button>
     <p class="navLabel admin">Admin</p>
     <button class="nav admin" data-page="addPlayer"><span aria-hidden="true">➕</span> Add Player</button>
     <button class="nav admin" data-page="add"><span aria-hidden="true">📝</span> Add Performance</button>
@@ -174,7 +177,7 @@
 
   <section class="page active" id="dashboard">
     <div class="dhHero" id="dhHero">
-      <img class="dhImg" src="assets/hero.jpg" alt="Kohat Zalmi cricket team in action">
+      <img class="dhImg" src="assets/hero.webp" alt="Kohat Zalmi cricket team in action" fetchpriority="high" decoding="async">
       <div class="dhShade"></div>
       <div class="dhGrid"></div>
       <i class="dhScan"></i>
@@ -337,6 +340,112 @@
     <div class="teamGrid hcGrid" id="teamGrid"></div>
   </section>
 
+  <section class="page journeyPage" id="journey" aria-labelledby="journeyHeroTitle">
+    <div class="journeyHero">
+      <div class="journeyHeroGrid" aria-hidden="true"></div>
+      <div class="journeyOrb journeyOrbOne" aria-hidden="true"></div>
+      <div class="journeyOrb journeyOrbTwo" aria-hidden="true"></div>
+      <div class="journeyHeroInner">
+        <div class="journeyEyebrow"><span class="journeyPulse"></span> KOHAT ZALMI <i></i> OUR STORY</div>
+        <h2 id="journeyHeroTitle">ABOUT <span>KOHAT ZALMI</span></h2>
+        <p class="journeyHeroTag">More Than A Team <span aria-hidden="true">❤️</span></p>
+        <div class="journeyQuote"><span class="journeyQuoteMark" aria-hidden="true">“</span><p>We didn't come together to form a team. We formed a team because we were already together.</p><span class="journeyQuoteLine" aria-hidden="true"></span></div>
+        <div class="journeyHeroFoot"><span>CHILDHOOD FRIENDS</span><i></i><span>ONE PASSION</span><i></i><span>ONE FAMILY</span></div>
+      </div>
+      <div class="journeyHeroSeal" aria-hidden="true"><b>KZ</b><span>EST. IN FRIENDSHIP</span></div>
+    </div>
+
+    <div class="journeyIntroRow">
+      <div class="journeyIntroCopy">
+        <span class="journeyKicker"><span data-journey-en>THE STORY BEHIND THE CREST</span><span data-journey-ur hidden>CREST KE PEECHE KI KAHANI</span></span>
+        <h3><span data-journey-en>Our Story</span><span data-journey-ur hidden>Hamari Kahani</span></h3>
+        <p><span data-journey-en>From childhood cricket sessions to a shared hard-ball dream — this is the story of the bond behind Kohat Zalmi.</span><span data-journey-ur hidden>Bachpan ke cricket matches se hard-ball ke mushtarka khwab tak — yeh Kohat Zalmi ke peeche dosti aur bhaicharay ki kahani hai.</span></p>
+      </div>
+      <div class="journeyLanguage" role="group" aria-label="Choose story language">
+        <span class="journeyLanguageLabel"><span data-journey-en>STORY LANGUAGE</span><span data-journey-ur hidden>KAHANI KI ZABAN</span></span>
+        <div class="journeyLanguageSwitch">
+          <button type="button" data-journey-lang="en" class="isActive" aria-pressed="true">English</button>
+          <button type="button" data-journey-lang="ur" aria-pressed="false">Roman Urdu</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="journeyStoryPanel journeyReveal">
+      <div class="journeyPanelTop"><span><span data-journey-en>01 / THE BEGINNING</span><span data-journey-ur hidden>01 / SHURUAAT</span></span><span class="journeyPanelGlyph" aria-hidden="true">✦</span></div>
+      <div class="journeyStoryCopy" data-journey-copy="en">
+        <p class="journeyLead">Kohat Zalmi is more than just a cricket team; it is a story of childhood friendship, passion and brotherhood.</p>
+        <p>Our journey began many years ago when we were just a group of childhood friends who shared one common passion: cricket. Growing up in Pakistan, where tape-ball cricket is a huge part of our culture, we spent countless hours playing together, creating memories and enjoying every moment on the field.</p>
+        <p>As time passed, our passion for cricket grew stronger. What started as casual tape-ball matches slowly turned into a bigger dream. Together, we decided to take the next step and move from tape-ball cricket to hard-ball cricket.</p>
+        <p>That decision marked the beginning of a new chapter in our journey.</p>
+        <p>Today, we stand together as Kohat Zalmi, carrying the same friendship, unity and passion that brought us together in childhood. We may have changed the ball, the format and the level of competition, but one thing has never changed: our bond as friends.</p>
+      </div>
+      <div class="journeyStoryCopy" data-journey-copy="ur" hidden>
+        <p class="journeyLead">Kohat Zalmi sirf aik cricket team nahi; yeh bachpan ki dosti, junoon aur bhaicharay ki kahani hai.</p>
+        <p>Hamara safar kai saal pehle shuru hua, jab hum bachpan ke doston ka aik group thay aur hum sab ka aik hi mushtarka shauq tha: cricket. Pakistan mein, jahan tape-ball cricket hamari culture ka aik bara hissa hai, hum ghanton aik saath khelte, yaadein banate aur ground par har lamha enjoy karte thay.</p>
+        <p>Waqt guzarnay ke saath cricket ke liye hamara junoon aur mazboot hota gaya. Jo shuru mein casual tape-ball matches thay, woh dheere dheere aik baray khwab mein badal gaye. Hum sab ne mil kar agla qadam uthane aur tape-ball cricket se hard-ball cricket ki taraf janay ka faisla kiya.</p>
+        <p>Yeh faisla hamare safar ke aik naye baab ki shuruaat tha.</p>
+        <p>Aaj hum Kohat Zalmi ke naam se aik saath kharay hain aur wohi dosti, ittehad aur cricket ka junoon apne saath liye hue hain jis ne humein bachpan mein jora tha. Ball, format aur muqablay ka level badal gaya, lekin doston ke taur par hamara rishta kabhi nahi badla.</p>
+      </div>
+    </div>
+
+    <div class="journeyTimelineHead journeyReveal">
+      <span class="journeyKicker"><span data-journey-en>THE ROAD THAT BROUGHT US HERE</span><span data-journey-ur hidden>WOH SAFAR JO HUMEIN YAHAAN LAYA</span></span>
+      <h3><span data-journey-en>One bond. Many memories.</span><span data-journey-ur hidden>Aik rishta. Be-shumar yaadein.</span></h3>
+    </div>
+    <div class="journeyTimeline">
+      <article class="journeyMoment journeyReveal">
+        <div class="journeyMomentNo">01</div><div class="journeyMomentMark" aria-hidden="true">✧</div>
+        <div><span class="journeyMomentKicker"><span data-journey-en>THE ROOTS</span><span data-journey-ur hidden>BUNYAAD</span></span>
+          <h4><span data-journey-en>Childhood Friendship</span><span data-journey-ur hidden>Bachpan Ki Dosti</span></h4>
+          <p><span data-journey-en>A circle of childhood friends, connected by one shared love for cricket.</span><span data-journey-ur hidden>Bachpan ke doston ka aik group, jo cricket ke aik mushtarka shauq se jura hua tha.</span></p></div>
+      </article>
+      <article class="journeyMoment journeyReveal">
+        <div class="journeyMomentNo">02</div><div class="journeyMomentMark" aria-hidden="true">◈</div>
+        <div><span class="journeyMomentKicker"><span data-journey-en>THE MEMORIES</span><span data-journey-ur hidden>YAADEIN</span></span>
+          <h4><span data-journey-en>Tape-Ball Days</span><span data-journey-ur hidden>Tape-Ball Ke Din</span></h4>
+          <p><span data-journey-en>Countless hours on the field, building memories and enjoying every game together.</span><span data-journey-ur hidden>Ground par be-shumar ghantay, aik saath khelna, yaadein banana aur har match ka lutf uthana.</span></p></div>
+      </article>
+      <article class="journeyMoment journeyReveal">
+        <div class="journeyMomentNo">03</div><div class="journeyMomentMark" aria-hidden="true">✦</div>
+        <div><span class="journeyMomentKicker"><span data-journey-en>THE NEXT CHAPTER</span><span data-journey-ur hidden>AGLA BAAB</span></span>
+          <h4><span data-journey-en>From Tape-Ball to Hard-Ball</span><span data-journey-ur hidden>Tape-Ball Se Hard-Ball Tak</span></h4>
+          <p><span data-journey-en>Our shared passion grew into a bigger dream, and together we chose to take the next step.</span><span data-journey-ur hidden>Hamara mushtarka junoon aik baray khwab mein badal gaya aur hum ne mil kar agla qadam uthanay ka faisla kiya.</span></p></div>
+      </article>
+      <article class="journeyMoment journeyReveal">
+        <div class="journeyMomentNo">04</div><div class="journeyMomentMark" aria-hidden="true">◉</div>
+        <div><span class="journeyMomentKicker"><span data-journey-en>TODAY</span><span data-journey-ur hidden>AAJ</span></span>
+          <h4><span data-journey-en>Kohat Zalmi</span><span data-journey-ur hidden>Kohat Zalmi</span></h4>
+          <p><span data-journey-en>A team carrying the same friendship, unity and passion — now playing as one family.</span><span data-journey-ur hidden>Aik team jo wohi dosti, ittehad aur junoon saath liye hue hai — aur ab aik family ban kar khelti hai.</span></p></div>
+      </article>
+    </div>
+
+    <div class="journeyPillarsHead journeyReveal">
+      <span class="journeyKicker"><span data-journey-en>WHAT MOVES US FORWARD</span><span data-journey-ur hidden>JO HUMEIN AAGE BARHATA HAI</span></span>
+      <h3><span data-journey-en>Our purpose. Our promise.</span><span data-journey-ur hidden>Hamara maqsad. Hamara wada.</span></h3>
+    </div>
+    <div class="journeyPillars">
+      <article class="journeyPillar journeyReveal"><div class="journeyPillarIcon" aria-hidden="true">◎</div><span class="journeyPillarNo">02.01</span>
+        <h4><span data-journey-en>Our Mission</span><span data-journey-ur hidden>Hamara Maqsad</span></h4>
+        <p><span data-journey-en>To grow together as cricketers, support each other, improve our skills and represent our team with pride, discipline and sportsmanship.</span><span data-journey-ur hidden>Cricketer ke taur par mil kar taraqqi karna, aik doosray ka saath dena, apni skills behtar banana aur fakhr, discipline aur sportsmanship ke saath apni team ki numaindagi karna.</span></p>
+      </article>
+      <article class="journeyPillar journeyReveal"><div class="journeyPillarIcon" aria-hidden="true">◇</div><span class="journeyPillarNo">02.02</span>
+        <h4><span data-journey-en>Our Vision</span><span data-journey-ur hidden>Hamara Vision</span></h4>
+        <p><span data-journey-en>To build a strong cricketing legacy while keeping our friendship and brotherhood alive, both on and off the field.</span><span data-journey-ur hidden>Cricket mein aik mazboot virsa banana aur ground ke andar aur bahar apni dosti aur bhaicharay ko hamesha zinda rakhna.</span></p>
+      </article>
+      <article class="journeyPillar journeyReveal"><div class="journeyPillarIcon" aria-hidden="true">✧</div><span class="journeyPillarNo">02.03</span>
+        <h4><span data-journey-en>Our Philosophy</span><span data-journey-ur hidden>Hamara Usool</span></h4>
+        <p><span data-journey-en>We started as childhood friends. We grew as cricketers. We play as one family.</span><span data-journey-ur hidden>Hum ne bachpan ke doston ke taur par shuruaat ki. Hum cricketers ban kar barhay. Hum aik family ban kar khelte hain.</span></p>
+      </article>
+    </div>
+
+    <div class="journeyFinal journeyReveal">
+      <span class="journeyFinalOverline"><span data-journey-en>KOHAT ZALMI • SINCE THE BEGINNING</span><span data-journey-ur hidden>KOHAT ZALMI • SHURUAAT SE</span></span>
+      <p><span data-journey-en>More than a team. Always a family.</span><span data-journey-ur hidden>Aik team se barh kar. Hamesha aik family.</span></p>
+      <h3>KOHAT ZALMI <i>—</i> <b><span data-journey-en>MORE THAN A TEAM.</span><span data-journey-ur hidden>AIK TEAM SE BARH KAR.</span></b></h3>
+      <div class="journeyFinalRule"><span></span><i>✦</i><span></span></div>
+    </div>
+  </section>
+
   <section class="page" id="addPlayer">
     <div class="panel form">
       <h2>Add Player</h2>
@@ -360,6 +469,7 @@
           <label>Balls<input name="balls" type="number" min="0" value="0"></label>
         </div>
         <label>Dismissed<input name="dismissed" type="number" min="0" max="1" value="0"></label>
+        <label class="inningsCheck"><input name="batted" type="checkbox"><span><b>Player batted in this match</b><small>Tick this even if the player scored 0 runs. Matches will still increase when left unticked.</small></span></label>
         <div class="formRow">
           <label>Overs<input name="overs" type="number" min="0" step=".1" value="0"></label>
           <label>Conceded<input name="conceded" type="number" min="0" value="0"></label>
@@ -415,6 +525,7 @@
       <label>Name<input name="name" required></label>
       <label>Jersey<input name="jersey"></label>
       <label>Role<input name="role" list="roleList"><datalist id="roleList"><option>Batsman</option><option>Bowler</option><option>All-rounder</option><option>Wicket-keeper</option></datalist></label>
+      <div class="formRow"><label>Matches played<input name="matches" type="number" min="0" step="1"></label><label>Batting innings<input name="innings" type="number" min="0" step="1"></label></div>
       <button class="primary">Save Changes</button>
     </form>
   </div>

@@ -66,7 +66,7 @@ function buildTeamReel(roster) {
     var first = String(p.name || "").replace(/^M\.\s*/, "").split(" ")[0];
     var badge = p.captain === "Captain" ? '<b class="gyRank" title="Captain">C</b>' : p.captain === "Vice Captain" ? '<b class="gyRank vc" title="Vice captain">VC</b>' : "";
     return '<button type="button" class="gyFace" role="listitem" style="--i:' + i + '" data-i="' + i + '" aria-label="Go to ' + esc(p.name) + ' card">' +
-      '<span class="gyShot"><img src="' + esc(p.photo) + '" alt="" decoding="async" draggable="false">' + badge + '</span>' +
+      '<span class="gyShot"><img src="' + esc(p.photo) + '" alt="" loading="lazy" decoding="async" draggable="false">' + badge + '</span>' +
       '<em>' + esc(first) + '</em></button>';
   }).join("");
 }
@@ -215,7 +215,7 @@ window.renderHeroCards = renderHeroCards;
   function installRouter() {
     var raw = window.go, warp = document.getElementById("gyWarp"), label = document.getElementById("gyTitle");
     if (typeof raw !== "function" || window.go.kz) return;
-    var fx = !!(warp && label) && !calm, busy = false, target = null, pending = null;
+    var fx = false, busy = false, target = null, pending = null; // Direct page swaps: no artificial 1.2s loading overlay.
 
     function activeId() { var a = document.querySelector(".page.active"); return a ? a.id : "dashboard"; }
     function valid(p) { var el = p && document.getElementById(p); return !!(el && el.classList.contains("page")); }
@@ -307,7 +307,7 @@ window.renderHeroCards = renderHeroCards;
    ========================================================================== */
 (function () {
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var LEADER_PHOTO = { "M. Jibran": "assets/jibran.jpg", "M. Bilal": "assets/bilal.jpg" };
+  var LEADER_PHOTO = { "M. Jibran": "assets/jibran.webp", "M. Bilal": "assets/bilal.webp" };
 
   function esc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]; }); }
   function seed(str) { var h = 1779033703 ^ str.length; for (var i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); } return function () { h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
@@ -334,7 +334,7 @@ window.renderHeroCards = renderHeroCards;
     var code = "KZ-" + (p.jersey ? String(p.jersey).padStart(2, "0") : String(i + 1).padStart(2, "0"));
     var st = findStats(p.name);
     var bounty = st ? ((+st.runs || 0) + 20 * (+st.wickets || 0)) + " BP" : "??? BP";
-    var stats = st ? '<div class="hcStats"><div><b>' + (+st.matches || 0) + "</b><small>MATCHES</small></div><div><b>" + (+st.runs || 0) + "</b><small>RUNS</small></div><div><b>" + (+st.wickets || 0) + "</b><small>WKTS</small></div></div>" : "";
+    var stats = st ? '<div class="hcStats"><div><b>' + (+st.matches || 0) + "</b><small>MATCHES</small></div><div><b>" + (+st.innings || 0) + "</b><small>INNINGS</small></div><div><b>" + (+st.runs || 0) + "</b><small>RUNS</small></div><div><b>" + (+st.wickets || 0) + "</b><small>WKTS</small></div></div>" : "";
     var rows = "";
     if (p.batting) rows += "<div><dt>BAT</dt><dd>" + esc(p.batting) + "</dd></div>";
     if (p.bowling) rows += "<div><dt>BOWL</dt><dd>" + esc(p.bowling) + "</dd></div>";
@@ -416,8 +416,6 @@ window.renderHeroCards = renderHeroCards;
         var p = c.pivot(), dx = e.clientX - p.x, dy = Math.max(30, e.clientY - p.y);
         c.target = Math.max(-MAX, Math.min(MAX, -Math.atan2(dx, dy)));
         c.wake();
-      } else if (!c.drag && !calm && e.pointerType === "mouse" && Math.abs(e.movementX) > 1) {
-        c.w = Math.max(-2.2, Math.min(2.2, c.w - e.movementX * 0.010)); c.wake();
       }
     }
     function up(e) {
@@ -444,7 +442,7 @@ window.renderHeroCards = renderHeroCards;
       var c = en.target._hc;
       if (en.isIntersecting && c && !c.seen) {
         c.seen = true; io.unobserve(en.target);
-        if (!calm) { c.th = (Math.random() < 0.5 ? -1 : 1) * (0.10 + Math.random() * 0.14); c.w = 0; c.wake(); }
+        // Keep cards still until the visitor interacts; avoids waking every card at once.
       }
     });
   }, { threshold: 0.25 }) : null;

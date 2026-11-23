@@ -2813,12 +2813,12 @@ body.splashOn .page.active{animation:none;opacity:0}
 body.kzLite .gyShaft,body.kzLite .gyWave.w3{display:none}
 @media (prefers-reduced-motion:reduce){#dsBg *,#dsFront *{animation:none !important}.gyB{display:none}}
 
-/* ---------------------------------------------------------------- D. OPENING SPLASH: Dead Calm (about 6s) */
-#gyIntro{position:fixed;inset:0;z-index:10000;overflow:hidden;color:#eaf8ff;animation:gyAway 0s linear 6.6s forwards}
+/* ---------------------------------------------------------------- D. OPENING SPLASH: Dead Calm (about 9s) */
+#gyIntro{position:fixed;inset:0;z-index:10000;overflow:hidden;color:#eaf8ff;animation:gyAway 0s linear 9s forwards}
 html.gySkip #gyIntro{display:none}
 @keyframes gyAway{to{visibility:hidden;pointer-events:none}}
 body.gyLock{overflow:hidden}
-.gyScene{position:absolute;inset:0;background:#02080e;overflow:hidden;animation:gyHide 0s linear 5.5s forwards}
+.gyScene{position:absolute;inset:0;background:#02080e;overflow:hidden;animation:gyHide 0s linear 7.8s forwards}
 @keyframes gyHide{to{visibility:hidden}}
 .gyScene > *{pointer-events:none}
 .gySky{position:absolute;inset:0;background:radial-gradient(110% 80% at 50% 58%,#0b3350 0,#06213a 42%,#02080e 100%)}
@@ -2845,14 +2845,14 @@ body.gyLock{overflow:hidden}
 .gyProg{position:absolute;left:50%;bottom:max(30px,calc(env(safe-area-inset-bottom) + 22px));width:min(420px,72vw);translate:-50% 0;opacity:0;animation:gyFade .6s ease .4s forwards}
 .gyProg span{display:block;margin-bottom:9px;font:700 11px/1 "Manrope",sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#8fb3c7}
 .gyTrack{display:block;height:3px;border-radius:3px;overflow:hidden;background:rgba(143,214,255,.18)}
-.gyTrack b{display:block;height:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#1d78b8,#5bb8f0 60%,#9bebd6);animation:gyBar 4.3s cubic-bezier(.35,.05,.25,1) .5s forwards}
+.gyTrack b{display:block;height:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#1d78b8,#5bb8f0 60%,#9bebd6);animation:gyBar 7.5s cubic-bezier(.35,.05,.25,1) .5s forwards}
 @keyframes gyBar{to{transform:scaleX(1)}}
 .gySkipBtn{position:absolute;right:max(14px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));min-height:40px;padding:9px 16px;border-radius:999px;pointer-events:auto !important;cursor:pointer;
   font:700 12px/1 "Manrope",sans-serif;letter-spacing:.06em;color:#dff1fb;background:rgba(10,40,62,.7);border:1px solid rgba(143,214,255,.4);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:background .25s ease}
 .gySkipBtn:hover{background:rgba(20,70,104,.85)}
 .gySkipBtn:focus-visible{outline:2px solid #9bebd6;outline-offset:2px}
-/* 4.8s -> 6.3s : water rises over the whole screen and clears away, revealing the site */
-.gyRise{position:absolute;left:0;right:0;top:calc(100% + 50px);height:130vh;will-change:transform;animation:gyRiseRun 1.5s linear 4.8s both;
+/* 7.5s -> 9s : water rises over the whole screen and clears away, revealing the site */
+.gyRise{position:absolute;left:0;right:0;top:calc(100% + 50px);height:130vh;will-change:transform;animation:gyRiseRun 1.5s linear 7.5s both;
   background:linear-gradient(180deg,#2a8fd0 0,#1d6fa8 12%,#0c4468 40%,#062a42 100%)}
 .gyRise::before{content:"";position:absolute;left:0;right:0;bottom:calc(100% - 1px);height:46px;background:#2a8fd0;
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V20Q40 0 80 20T160 20V40Z'/%3E%3C/svg%3E") 0 100%/160px 46px repeat-x;
@@ -3009,3 +3009,115 @@ body.gyLock{overflow:hidden}
 
 /* the team hero already carries the page title, so the plain page heading is kept for screen readers only */
 main:has(#team.active) .heading{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+
+/* ========================================================================
+   OUR JOURNEY — cinematic friendship story, responsive and motion-aware
+   ======================================================================== */
+.journeyPage{gap:clamp(22px,3.4vw,42px);overflow:clip}
+.journeyHero{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(410px,50vw,610px);display:flex;align-items:center;border:1px solid rgba(134,207,239,.3);border-radius:30px;
+  color:#effaff;background:radial-gradient(ellipse at 78% 22%,rgba(61,165,210,.23),transparent 32%),radial-gradient(ellipse at 12% 95%,rgba(210,170,87,.16),transparent 34%),linear-gradient(135deg,#04121e 0%,#092c40 52%,#071a2c 100%);box-shadow:0 32px 90px -48px rgba(0,0,0,.9),inset 0 0 0 1px rgba(255,255,255,.035)}
+.journeyHero::before,.journeyHero::after{content:"";position:absolute;z-index:-1;pointer-events:none}
+.journeyHero::before{inset:-40%;opacity:.34;background:conic-gradient(from 35deg at 50% 50%,transparent 0 18%,rgba(92,190,229,.22) 22%,transparent 29% 48%,rgba(221,181,101,.18) 52%,transparent 61% 100%);animation:journeyOrbit 24s linear infinite}
+.journeyHero::after{inset:0;background:linear-gradient(90deg,rgba(2,14,24,.1),transparent 55%,rgba(2,14,24,.18)),repeating-linear-gradient(135deg,transparent 0 48px,rgba(155,220,247,.035) 49px 50px)}
+.journeyHeroGrid{position:absolute;inset:0;opacity:.15;pointer-events:none;background-image:linear-gradient(rgba(150,220,255,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(150,220,255,.2) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(90deg,transparent,#000 55%,#000)}
+.journeyOrb{position:absolute;width:260px;aspect-ratio:1;border:1px solid rgba(137,218,246,.16);border-radius:50%;pointer-events:none;filter:drop-shadow(0 0 35px rgba(83,181,219,.16));animation:journeyFloat 9s ease-in-out infinite}
+.journeyOrb::before,.journeyOrb::after{content:"";position:absolute;inset:14%;border:1px solid rgba(226,190,118,.2);border-radius:50%;transform:rotate(40deg) scaleX(.58)}
+.journeyOrb::after{inset:28%;border-color:rgba(139,219,249,.25);transform:rotate(-35deg) scaleX(.75)}
+.journeyOrbOne{right:8%;top:8%;width:clamp(190px,28vw,390px)}.journeyOrbTwo{right:29%;bottom:-22%;width:190px;animation-delay:-4s;opacity:.55}
+.journeyHeroInner{position:relative;z-index:2;width:min(100%,850px);padding:clamp(30px,6vw,78px)}
+.journeyEyebrow,.journeyKicker,.journeyLanguageLabel,.journeyFinalOverline{display:flex;align-items:center;gap:10px;font:800 10px/1.4 "Manrope",sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#9bd9ef}
+.journeyPulse{width:7px;height:7px;border-radius:50%;background:#d5b36f;box-shadow:0 0 0 5px rgba(213,179,111,.12),0 0 18px rgba(213,179,111,.8);animation:journeyPulse 2s ease-in-out infinite}
+.journeyEyebrow i,.journeyHeroFoot i{width:4px;height:4px;border-radius:50%;background:#d6b56f;box-shadow:0 0 10px rgba(214,181,111,.7)}
+.journeyHero h2{margin:26px 0 0;font:800 clamp(42px,8.1vw,104px)/.95 "Sora","Manrope",sans-serif;letter-spacing:-.075em;color:#f4fbff;text-transform:uppercase;text-shadow:0 10px 40px rgba(0,0,0,.28)}
+.journeyHero h2 span{display:block;margin-top:12px;color:#a8e3f8;text-shadow:0 0 38px rgba(93,189,227,.27)}
+.journeyHeroTag{display:flex;align-items:center;gap:10px;margin:22px 0 0;font:800 clamp(17px,2.4vw,25px) "Manrope",sans-serif;letter-spacing:.04em;color:#e6c98a}
+.journeyHeroTag span{font-size:.88em;filter:drop-shadow(0 0 10px rgba(255,95,130,.45))}
+.journeyQuote{position:relative;display:flex;align-items:center;gap:15px;max-width:700px;margin-top:38px;padding:19px 22px;border:1px solid rgba(158,218,239,.24);border-left:3px solid #d5b36f;border-radius:4px 16px 16px 4px;background:linear-gradient(100deg,rgba(9,43,62,.83),rgba(7,29,45,.48));box-shadow:0 15px 38px -28px #000;backdrop-filter:blur(10px)}
+.journeyQuoteMark{align-self:flex-start;color:#e1c17e;font:600 56px/.8 Georgia,serif;opacity:.88}
+.journeyQuote p{margin:0;font:700 clamp(14px,1.75vw,19px)/1.65 "Manrope",sans-serif;color:#effaff;letter-spacing:-.02em}
+.journeyQuoteLine{position:absolute;right:18px;bottom:-1px;width:72px;height:2px;background:linear-gradient(90deg,transparent,#a7e3f6)}
+.journeyHeroFoot{display:flex;align-items:center;gap:13px;margin-top:32px;font:800 9px "Rajdhani",sans-serif;letter-spacing:.22em;color:rgba(212,238,249,.68)}
+.journeyHeroSeal{position:absolute;right:clamp(24px,6vw,82px);bottom:42px;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:104px;height:104px;border:1px solid rgba(220,188,119,.42);border-radius:50%;background:rgba(3,21,33,.55);box-shadow:0 0 0 7px rgba(221,188,120,.055),0 0 35px rgba(78,174,211,.15);transform:rotate(9deg)}
+.journeyHeroSeal b{font:800 32px "Sora",sans-serif;letter-spacing:-.1em;color:#e8c985}.journeyHeroSeal span{margin-top:3px;font:800 6px "Rajdhani",sans-serif;letter-spacing:.17em;color:#b4dcec}
+.journeyIntroRow{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:6px 2px 0}
+.journeyIntroCopy{max-width:660px}.journeyIntroCopy h3,.journeyTimelineHead h3,.journeyPillarsHead h3{margin:10px 0 8px;font:800 clamp(26px,4vw,42px)/1.1 "Sora",sans-serif;letter-spacing:-.055em;color:var(--text)}
+.journeyIntroCopy p{max-width:620px;margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.journeyLanguage{flex:none;display:flex;flex-direction:column;gap:9px;align-items:flex-end}
+.journeyLanguageLabel{font-size:8px;letter-spacing:.17em;color:var(--muted)}
+.journeyLanguageSwitch{display:flex;gap:4px;padding:4px;border:1px solid var(--line-strong);border-radius:999px;background:var(--surface-2);box-shadow:var(--shadow-1)}
+.journeyLanguageSwitch button{min-height:38px;padding:0 16px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:800 11px "Manrope",sans-serif;cursor:pointer;transition:background .25s,color .25s,box-shadow .25s}
+.journeyLanguageSwitch button.isActive{color:#071b27;background:linear-gradient(120deg,#e9cc8d,#a9e2f4);box-shadow:0 5px 18px -9px rgba(141,202,224,.8)}
+.journeyStoryPanel{position:relative;overflow:hidden;padding:clamp(23px,4vw,44px);border:1px solid rgba(125,193,220,.27);border-radius:22px;background:linear-gradient(145deg,var(--surface),color-mix(in srgb,var(--surface-2) 86%,#0b536e 14%));box-shadow:var(--shadow-1)}
+.journeyStoryPanel::before{content:"";position:absolute;top:0;left:0;width:42%;height:2px;background:linear-gradient(90deg,#e5c37d,#96dff4,transparent);box-shadow:0 0 22px rgba(127,203,230,.48)}
+.journeyStoryPanel::after{content:"KZ";position:absolute;right:-18px;bottom:-68px;color:rgba(130,190,214,.055);font:800 220px/.9 "Sora",sans-serif;letter-spacing:-.12em;pointer-events:none}
+.journeyPanelTop{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;margin-bottom:19px;font:800 9px "Rajdhani",sans-serif;letter-spacing:.23em;color:var(--muted)}
+.journeyPanelGlyph{font-size:20px;color:#d8b978;text-shadow:0 0 18px rgba(216,185,120,.7)}
+.journeyStoryCopy{position:relative;z-index:1;max-width:970px;color:var(--text-2);font-size:13px;line-height:1.95}
+.journeyStoryCopy p{margin:0 0 14px}.journeyStoryCopy p:last-child{margin-bottom:0}
+.journeyStoryCopy .journeyLead{margin-bottom:18px;color:var(--text);font:800 clamp(17px,2vw,21px)/1.6 "Manrope",sans-serif;letter-spacing:-.025em}
+.journeyTimelineHead,.journeyPillarsHead{padding:8px 2px 0}
+.journeyTimelineHead h3,.journeyPillarsHead h3{margin-bottom:0}
+.journeyTimeline{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.journeyTimeline::before{content:"";position:absolute;top:27px;left:7%;right:7%;height:1px;background:linear-gradient(90deg,transparent,rgba(120,202,230,.55),rgba(220,188,119,.65),transparent)}
+.journeyMoment{position:relative;display:flex;flex-direction:column;min-height:218px;padding:20px 18px 21px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(155deg,var(--surface),var(--surface-2));box-shadow:var(--shadow-1);transition:transform .35s var(--ease),border-color .35s,box-shadow .35s;overflow:hidden}
+.journeyMoment::after,.journeyPillar::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(140deg,rgba(131,216,242,.42),transparent 42%,rgba(220,188,119,.32));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.75}
+.journeyMoment:hover,.journeyPillar:hover{transform:translateY(-6px);border-color:rgba(135,207,231,.46);box-shadow:0 20px 45px -32px rgba(58,165,204,.62),var(--shadow-1)}
+.journeyMomentNo{position:absolute;right:15px;top:13px;color:var(--muted);font:800 10px "Rajdhani",sans-serif;letter-spacing:.12em}
+.journeyMomentMark{position:relative;z-index:1;display:grid;place-items:center;width:38px;height:38px;margin:0 0 21px;border:1px solid rgba(130,203,229,.35);border-radius:12px;color:#a8e0f2;background:rgba(70,154,187,.1);box-shadow:inset 0 0 20px rgba(87,180,215,.08),0 0 18px rgba(80,171,202,.08);font-size:18px}
+.journeyMomentKicker{display:block;margin-bottom:7px;font:800 8px "Rajdhani",sans-serif;letter-spacing:.2em;color:#c7a963}
+.journeyMoment h4,.journeyPillar h4{position:relative;z-index:1;margin:0 0 9px;color:var(--text);font:800 16px/1.3 "Manrope",sans-serif;letter-spacing:-.03em}
+.journeyMoment p,.journeyPillar p{position:relative;z-index:1;margin:0;color:var(--muted);font-size:11px;line-height:1.8}
+.journeyPillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.journeyPillar{position:relative;isolation:isolate;overflow:hidden;min-height:242px;padding:24px;border:1px solid var(--line);border-radius:19px;background:linear-gradient(145deg,var(--surface),var(--surface-2));box-shadow:var(--shadow-1);transition:transform .35s var(--ease),border-color .35s,box-shadow .35s}
+.journeyPillar::before{content:"";position:absolute;z-index:-1;right:-65px;top:-75px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(103,193,223,.16),transparent 68%);filter:blur(8px)}
+.journeyPillarIcon{display:grid;place-items:center;width:46px;height:46px;margin-bottom:19px;border:1px solid rgba(131,203,228,.36);border-radius:14px;background:rgba(84,175,208,.1);color:#a8e0f2;font-size:22px;text-shadow:0 0 15px rgba(133,216,246,.48)}
+.journeyPillarNo{position:absolute;right:20px;top:24px;color:var(--muted);font:800 10px "Rajdhani",sans-serif;letter-spacing:.15em}
+.journeyPillar h4{font-size:18px;margin-bottom:11px}
+.journeyFinal{position:relative;isolation:isolate;overflow:hidden;padding:clamp(32px,5vw,56px) 24px;text-align:center;border:1px solid rgba(137,204,226,.3);border-radius:22px;background:radial-gradient(ellipse at 50% 0%,rgba(85,171,204,.23),transparent 60%),linear-gradient(135deg,#051724,#0b3045 55%,#071725);color:#eaf8ff;box-shadow:0 28px 70px -45px rgba(0,0,0,.8)}
+.journeyFinal::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.2;background:repeating-linear-gradient(135deg,transparent 0 20px,rgba(166,220,241,.15) 21px 22px);mask-image:linear-gradient(90deg,transparent,#000,transparent)}
+.journeyFinalOverline{justify-content:center;font-size:8px;color:#abddec}
+.journeyFinal p{margin:18px 0 8px;color:#e2c78d;font:700 15px "Manrope",sans-serif;letter-spacing:.04em}
+.journeyFinal h3{margin:0;font:800 clamp(19px,3.8vw,36px) "Sora",sans-serif;letter-spacing:-.04em}
+.journeyFinal h3 i{color:#8bd5ee;font-style:normal}.journeyFinal h3 b{color:#a9e2f2}
+.journeyFinalRule{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:22px;color:#e2c78d}
+.journeyFinalRule span{width:min(120px,20vw);height:1px;background:linear-gradient(90deg,transparent,#a8dced)}.journeyFinalRule span:last-child{transform:rotate(180deg)}
+.journeyFinalRule i{font-style:normal;text-shadow:0 0 13px #e2c78d}
+.journeyReveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s var(--ease-out)}
+.journeyReveal.in{opacity:1;transform:none}
+.journeyMoment:nth-child(2),.journeyPillar:nth-child(2){transition-delay:90ms}.journeyMoment:nth-child(3),.journeyPillar:nth-child(3){transition-delay:180ms}.journeyMoment:nth-child(4){transition-delay:270ms}
+@keyframes journeyOrbit{to{transform:rotate(360deg)}}
+@keyframes journeyFloat{0%,100%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(0,-13px,0) rotate(7deg)}}
+@keyframes journeyPulse{0%,100%{box-shadow:0 0 0 5px rgba(213,179,111,.12),0 0 18px rgba(213,179,111,.8)}50%{box-shadow:0 0 0 9px rgba(213,179,111,.04),0 0 25px rgba(213,179,111,.95)}}
+[hidden]{display:none!important}
+@media(max-width:900px){.journeyTimeline{grid-template-columns:repeat(2,minmax(0,1fr))}.journeyTimeline::before{display:none}.journeyMoment{min-height:190px}.journeyHeroSeal{right:28px;bottom:25px;width:82px;height:82px}.journeyHeroSeal b{font-size:26px}}
+@media(max-width:640px){.journeyPage{gap:24px}.journeyHero{min-height:520px;border-radius:22px}.journeyHeroInner{padding:28px 20px 120px}.journeyHero h2{font-size:clamp(40px,12vw,58px);margin-top:22px}.journeyHeroTag{margin-top:17px}.journeyQuote{margin-top:28px;padding:15px 14px;gap:8px}.journeyQuoteMark{font-size:42px}.journeyQuote p{font-size:13px;line-height:1.55}.journeyHeroFoot{flex-wrap:wrap;gap:9px;margin-top:23px;font-size:8px}.journeyOrbOne{right:-24%;top:4%;width:260px}.journeyOrbTwo{right:35%;bottom:-15%;width:140px}.journeyHeroSeal{right:21px;bottom:20px;width:70px;height:70px}.journeyHeroSeal b{font-size:23px}.journeyHeroSeal span{font-size:5px}.journeyIntroRow{align-items:flex-start;flex-direction:column;gap:18px}.journeyLanguage{align-items:flex-start}.journeyLanguageSwitch{width:100%}.journeyLanguageSwitch button{flex:1;padding:0 12px}.journeyStoryPanel{padding:21px 18px;border-radius:18px}.journeyStoryCopy{font-size:12px;line-height:1.85}.journeyTimeline{gap:10px}.journeyMoment{min-height:212px;padding:16px 13px}.journeyMoment h4{font-size:14px}.journeyMoment p{font-size:10px}.journeyPillars{grid-template-columns:1fr;gap:11px}.journeyPillar{min-height:0;padding:20px}.journeyPillar p{font-size:11px}.journeyPillarIcon{margin-bottom:13px}.journeyFinal{border-radius:18px;padding:34px 16px}.journeyFinal h3{line-height:1.35}}
+@media(max-width:380px){.journeyTimeline{grid-template-columns:1fr}.journeyMoment{min-height:0;padding:18px}.journeyHeroInner{padding-left:17px;padding-right:17px}.journeyHero h2{font-size:39px}.journeyHeroFoot{letter-spacing:.15em}}
+@media(prefers-reduced-motion:reduce){.journeyHero::before,.journeyOrb,.journeyPulse{animation:none!important}.journeyReveal{opacity:1;transform:none;transition:none}.journeyMoment,.journeyPillar{transition:none}}
+
+/* Performance: lighter background on phones and low-powered devices. */
+body.kzLite .gyWaves,body.kzLite .gyB,body.kzLite .gyShaft{display:none!important}
+@media(max-width:700px){#dsBg .gyShaft,#dsBg .gyB,#dsBg .gyWave.w2,#dsBg .gyWave.w3{display:none!important}#dsBg .gyWave.w1{animation:none;opacity:.55}}
+.page.active{animation:pageIn .24s var(--ease-out) both}
+@keyframes pageIn{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
+
+/* Keep the full 9-second opening sequence consistent on mobile and desktop. */
+#gyIntro .gyDrop{animation-duration:.9s;animation-delay:.1s}
+#gyIntro .rp{animation-duration:2.6s;animation-delay:calc(.9s + var(--k) * .42s)}
+#gyIntro .rb{animation-duration:2.1s;animation-delay:calc(1.3s + var(--k) * .22s)}
+#gyIntro .gyEmblem{animation-duration:1s;animation-delay:2.4s}
+#gyIntro .gyName{animation-duration:1.3s;animation-delay:3s}
+#gyIntro .gyRule{animation-duration:1s;animation-delay:3.6s}
+#gyIntro .gyTag{animation-duration:.9s;animation-delay:3.9s}
+#gyIntro .gyForm{animation-duration:.9s;animation-delay:4.2s}
+#gyIntro .gyProg{animation-delay:.4s}
+#gyIntro .gyTrack b{animation-duration:7.5s;animation-delay:.5s}
+#gyIntro .gyRise{animation:gyRiseRun 1.5s linear 7.5s both}
+@media(prefers-reduced-motion:reduce){#gyIntro{display:none!important}}
+
+/* Innings indicator and the admin's explicit batting toggle. */
+.inningsCheck{display:flex!important;align-items:flex-start;gap:12px;padding:13px 14px;border:1px solid var(--line-strong);border-radius:13px;background:var(--surface-2)}
+.inningsCheck input{flex:none;width:19px;height:19px;margin:2px 0 0;accent-color:#65c9e8}
+.inningsCheck span{display:flex;flex-direction:column;gap:4px}.inningsCheck b{font-size:12px;color:var(--text)}.inningsCheck small{font-size:10px;line-height:1.5;color:var(--muted)}
+.hcStats{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(min-width:900px){.rkStats{grid-template-columns:repeat(7,minmax(0,1fr))}}
